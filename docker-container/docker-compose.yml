@@ -1,0 +1,19 @@
+services:
+  flaskion:
+    restart: always
+    build: .
+    container_name: py311_flask
+    ports:
+      - "5100:5100"
+      - "5150:5150" # for debugging
+      - "5151:5151"
+    tty: true
+    volumes:
+      - env:/var/docker-flask/flaskion/env
+      - ../flaskion:/var/docker-flask/flaskion
+    environment:
+      - FLASK_APP=server.py
+      - FLASK_ENV=development
+    command: /var/docker-flask/flaskion/env/bin/python -m flask run --host=0.0.0.0 --port=5100
+volumes:
+  env:

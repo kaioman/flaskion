@@ -1,0 +1,12 @@
+{
+    "name": "Flask Dev Container",
+    "dockerComposeFile": ["../docker-container/docker-compose.yml"],
+    "service": "flaskion",
+    "workspaceFolder": "/var/docker-flask/flaskion"
+    //"forwardPorts": [5100, 5150, 5151],
+    //"portsAttributes": {
+    //    "5100": { "onAutoForward": "ignore" },
+    //    "5150": { "onAutoForward": "ignore" },
+    //    "5151": { "onAutoForward": "ignore" }
+    //}
+}

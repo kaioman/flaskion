@@ -1,13 +1,18 @@
-from flask import Flask, render_template
+from flask import Flask
 from flask_socketio import SocketIO
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
+from .routes import register_routes
 import os
 import sys
 import time
 
+# FlaskアプリケーションとSocketIOの初期化
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+
+# ルートを登録
+register_routes(app)
 
 class ReloadHandler(FileSystemEventHandler):
     def on_any_event(self, event):
@@ -23,7 +28,3 @@ class ReloadHandler(FileSystemEventHandler):
 observer = PollingObserver()
 observer.schedule(ReloadHandler(), path=".", recursive=True)
 observer.start()
-
-@app.route("/")
-def index():
-    return render_template("index.html")

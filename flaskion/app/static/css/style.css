@@ -1,0 +1,42 @@
+/* 全ページ共通のベーススタイル */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* 見出しや段落の基本スタイル */
+h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5em;
+    animation: fadeIn 1s ease-in-out;
+}
+
+p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+/* 結果表示エリア */
+#result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+}
+
+/* 共通アニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,56 @@
+/* バッジコンポーネント */
+.badge {
+    background-color: #ff4081;
+    color: white;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 1em;
+}
+
+/* 入力ボックス */
+input[type="text"] {
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #f0f0f0;
+    font-size: 1rem;
+    backdrop-filter: blur(6px);
+    transition: all 0.3s ease;
+}
+
+input[type="text"]::placeholder {
+    color: rgba(240, 240, 240, 0.6);
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #00ffe0;
+    box-shadow: 0 0 12px #00ffe0;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ボタン */
+button {
+    margin-left: 1rem;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background: linear-gradient(135deg, #3a3f5c, #5a5f7c); /* 落ち着いたブルーグレー系 */
+    color: #f0f0f0;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #4a4f6c, #6a6f8c); /* 少し明るく */
+    box-shadow: 0 0 12px rgba(0, 255, 224, 0.4); /* 控えめなネオンブルー */
+}
+
+button:active {
+    transform: scale(0.95);
+}

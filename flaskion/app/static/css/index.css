@@ -1,0 +1,12 @@
+/* indexページ固有のスタイル */
+h1::before {
+    content: "🚀 ";
+}
+
+p {
+    text-align: center;
+}
+
+.prompt-box {
+    width: 500px;
+}

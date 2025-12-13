@@ -28,3 +28,12 @@ class ReloadHandler(FileSystemEventHandler):
 observer = PollingObserver()
 observer.schedule(ReloadHandler(), path=".", recursive=True)
 observer.start()
+
+# if __name__ == "__main__":
+    
+#     # 監視対象を追加
+#     server = Server(app.wsgi_app)
+#     server.watch('template/')
+#     server.watch('static/')
+#     server.serve(port=5100, host='127.0.0.1')
+    

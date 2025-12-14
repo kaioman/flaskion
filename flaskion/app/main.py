@@ -9,7 +9,7 @@ import time
 
 # FlaskアプリケーションとSocketIOの初期化
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
 
 # ルートを登録
 register_routes(app)
@@ -22,18 +22,9 @@ class ReloadHandler(FileSystemEventHandler):
             # コンソールに変更検知を表示
             print(f"🔄 ソースコード変更検知: {event.src_path} | タイプ: {event.event_type}  再起動します...")
             # Flaskアプリケーションを再起動する
-            os.execv(sys.executable, ['python'] + sys.argv)
+            os.execv(sys.executable, [sys.executable] + sys.argv)
             
 # ソースコード変更を監視する
 observer = PollingObserver()
 observer.schedule(ReloadHandler(), path=".", recursive=True)
 observer.start()
-
-# if __name__ == "__main__":
-    
-#     # 監視対象を追加
-#     server = Server(app.wsgi_app)
-#     server.watch('template/')
-#     server.watch('static/')
-#     server.serve(port=5100, host='127.0.0.1')
-    

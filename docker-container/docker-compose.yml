@@ -10,8 +10,7 @@ services:
       - env:/var/docker-flask/flaskion/env
       - ../flaskion:/var/docker-flask/flaskion
     environment:
-      - FLASK_APP=server.py
       - FLASK_ENV=production
-    command: ./env/bin/gunicorn -w 1 -k eventlet -b 0.0.0.0:5100 server:app
+    command: ./env/bin/gunicorn -w 4 -k gevent -b 0.0.0.0:5100 server:app
 volumes:
   env:

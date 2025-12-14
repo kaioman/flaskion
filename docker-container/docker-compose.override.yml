@@ -6,4 +6,5 @@ services:
       - "5151:5151"
     environment:
       - FLASK_ENV=development
+      - FLASK_APP=server.py
     command: /var/docker-flask/flaskion/env/bin/python -m flask run --host=0.0.0.0 --port=5100

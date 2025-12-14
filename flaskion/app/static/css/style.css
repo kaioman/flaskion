@@ -1,42 +1,180 @@
 /* 全ページ共通のベーススタイル */
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1f1c2c, #928dab);
-    color: #f0f0f0;
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background-color: #ffffff;
+    color: #000000;
+    line-height: 1.6;
+}
+
+.header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+    padding: 1rem 2rem;
+    background-color: #1a1a1a;
 }
 
-/* 見出しや段落の基本スタイル */
-h1 {
-    font-size: 3rem;
-    margin-bottom: 0.5em;
-    animation: fadeIn 1s ease-in-out;
+.nav a {
+    margin: 0 0.5rem;
+    padding: 0.4rem 0.8rem;
+    color: #ffffff;
+    text-decoration: none;
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-p {
-    font-size: 1.2rem;
-    opacity: 0.8;
+.nav a:hover {
+    background-color: #f5fff5;
+    color: #0f0f0f;
 }
 
-/* 結果表示エリア */
-#result {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    backdrop-filter: blur(6px);
-    width: 320px;
+.logo img {
+    height: 30px;
+    width: auto;
+    vertical-align: middle;
+    background: transparent;
+}
+
+.signin {
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.hero {
     text-align: center;
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    padding: 1rem 2rem;
 }
 
-/* 共通アニメーション */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to   { opacity: 1; transform: translateY(0); }
+.hero h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.hero .accent {
+    color: #4888ff;
+}
+
+.hero-icon {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.hero-image {
+    margin-top: 2rem;
+    width: 45%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+    align-items: stretch;
+}
+
+.card {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 2rem;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    border: 1px solid #000000;
+}
+
+.card:hover {
+    background-color: #f5fff5;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+}
+
+.icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn.blue {
+    background-color: #4888ff;
+    color: #ffffff;
+}
+
+.btn.purple {
+    background-color: #ae6fe9;
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .hero {
+        padding: 2rem 1rem;
+    }
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    .hero-image {
+        width: 80%;
+    }
+    .card {
+        max-width: 100%;
+    }
+    .btn {
+        width: 100%;
+        padding: 0.8rem;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    .nav {
+        justify-content: center;
+    }
+    .features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        justify-items: center;
+    }
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    .hero-image {
+        width: 60%;
+    }
+    .card {
+        max-width: 90%;
+    }
 }

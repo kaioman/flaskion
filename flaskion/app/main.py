@@ -26,5 +26,5 @@ class ReloadHandler(FileSystemEventHandler):
             
 # ソースコード変更を監視する
 observer = PollingObserver()
-observer.schedule(ReloadHandler(), path=".", recursive=True)
+observer.schedule(ReloadHandler(), path="./app", recursive=True)
 observer.start()

@@ -5,3 +5,4 @@ eventlet
 watchdog
 gunicorn
 gevent
+pycorex

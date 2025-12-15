@@ -19,11 +19,9 @@ input[type="text"] {
     backdrop-filter: blur(6px);
     transition: all 0.3s ease;
 }
-
 input[type="text"]::placeholder {
     color: rgba(240, 240, 240, 0.6);
 }
-
 input[type="text"]:focus {
     outline: none;
     border-color: #00ffe0;
@@ -44,17 +42,16 @@ button {
     color: #f0f0f0;
     transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
-
 button:hover {
     transform: translateY(-2px);
     background: linear-gradient(135deg, #4a4f6c, #6a6f8c); /* 少し明るく */
     box-shadow: 0 0 12px rgba(0, 255, 224, 0.4); /* 控えめなネオンブルー */
 }
-
 button:active {
     transform: scale(0.95);
 }
 
+/* エラーメッセージ */
 .error-message {
     color: red;
     font-weight: bold;

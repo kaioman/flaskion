@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% import "components.html" as ui %}
+
+<!-- ページタイトル -->
+{% block title %}画像生成 | Uwgen{% endblock %}
+
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/image_gen.css') }}">
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<section class="hero hero--compact">
+    <h1>画像生成</h1>
+    <p>言葉からビジュアルへ。スタイルとサイズを選び、生成を実行します</p>
+</section>
+
+<main class="gen-container">
+    <!-- 入力フォーム -->
+    <form class="gen-form" method="post" novalidate>
+
+        <!-- プロンプト -->
+        <div class="form-row">
+            <label for="prompt"><span class="req">*</span>プロンプト</label>
+            <textarea id="prompt" name="prompt" rows="3" 
+                required
+                placeholder="プロンプトを入力"></textarea>
+        </div>
+
+        <!-- エラーメッセージ -->
+        {% if error %}
+        <div class="form-row error">
+            <p class="error-message">{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <!-- 生成条件 -->
+        <div class="form-grid">
+            <!-- モデル -->
+            {{ ui.render_select("model", "モデル", models, selected_model, display="name") }}
+            <!-- 解像度 -->
+            {{ ui.render_select("resolution", "解像度", resolutions, selected_resolution, display="name_value") }}
+            <!-- アスペクト比 -->
+            {{ ui.render_select("aspect", "アスペクト比", aspects, selected_aspect, display="name_value") }}
+            <!-- 安全フィルター -->
+            {{ ui.render_select("safety_filter", "安全フィルター", safety_filters, selected_safety_filter, display="name") }}
+            <!-- 安全フィルタリングレベル -->
+            {{ ui.render_select("safety_level", "安全フィルタリングレベル", safety_levels, selected_safety_level, display="name") }}
+        </div>
+
+        <!-- ボタンエリア -->
+        <div class="form-row actions">
+            <button class="btn bule" type="submit">生成する</button>
+            <button class="btn" type="reset">リセット</button>
+        </div>
+    </form>
+
+    <!-- 結果表示エリア -->
+    {% if generated %}
+    <section class="result">
+        <h2>生成結果</h2>
+        <div class="result-list">
+            {% for path in generated %}
+            <div class="result-card">
+                <img src="{{ url_for('static', filename=path.split('static/', 1)[1]) }}"
+                    alt="生成画像" class="result-img">
+                <div class="result-meta">
+                    <a href="{{ url_for('static', filename=path.split('static/', 1)[1]) }}"
+                        class="btn purple" download>ダウンロード</a>
+                    <button class="btn"
+                        onclick="navigator.clipboard.writeText('{{ request.url_root }}{{ url_for('static', filename=path.split('static/', 1)[1]) }}')">
+                        URLをコピー
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</main>
+<!-- JS 読込 -->
+<script src="{{ url_for('static', filename='js/image_gen.js') }}"></script>
+{% endblock %}

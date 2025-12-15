@@ -1,56 +1,42 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Uwgen Built on Flaskion</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-</head>
-<body>
-    <header class="header">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='images/uwgen_logo_black_bg_transparent.png') }}" alt="Uwgen">
-        </div>
-        <nav class="nav">
-            <a href="#">テキスト生成</a>
-            <a href="#">画像生成</a>
-            <a href="#">画像編集</a>
-        </nav>
-        <div class="signin">サインイン</div>
-    </header>
+{% extends "base.html" %}
 
-    <section class="hero">
-        <h1>
-            <img src="{{ url_for('static', filename='images/hero-icon.png' )}}" alt="Uwgen Icon" class="hero-icon">
-            解放された想像を、<span class="accent">Uwgen</span>で
-        </h1>
-        <p>テキスト生成・画像生成・画像編集を、誰でも気軽に</p>
-        <img src="{{ url_for('static', filename='images/hero.png') }}" class="hero-image">
-    </section>
+<!-- ページタイトル -->
+{% block title %}Uwgen Built on Flaskion{% endblock %}
 
-    <section class="features">
-        <div class="card text">
-            <img src="static/images/text-gen-icon_64x64.png" alt="Text Generation" class="card-icon">
-            <h2>テキスト生成</h2>
-            <p>AIが文章を生成します</p>
-            <button class="btn blue">テキストを生成</button>
-        </div>
-        <div class="card image">
-            <img src="static/images/image-gen-icon_64x64.png" alt="Image Generation" class="card-icon">
-            <h2>画像生成</h2>
-            <p>キーワードから画像を生成します</p>
-            <button class="btn purple">画像を生成</button>
-        </div>
-        <div class="card edit">
-            <img src="static/images/image-edit-icon_64x64.png" alt="Image Editing" class="card-icon">
-            <h2>画像編集</h2>
-            <p>画像を編集・加工します</p>
-            <button class="btn blue">画像を編集</button>
-        </div>
-    </section>
-</body>
-</html>
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<section class="hero">
+    <h1>
+        <img src="{{ url_for('static', filename='images/hero-icon.png' )}}" alt="Uwgen Icon" class="hero-icon">
+        解放された想像を、<span class="accent">Uwgen</span>で
+    </h1>
+    <p>テキスト生成・画像生成・画像編集を、誰でも気軽に</p>
+    <img src="{{ url_for('static', filename='images/hero.png') }}" class="hero-image">
+</section>
+
+<section class="features">
+    <div class="card text">
+        <img src="static/images/text-gen-icon_64x64.png" alt="Text Generation" class="card-icon">
+        <h2>テキスト生成</h2>
+        <p>AIが文章を生成します</p>
+        <a href="#" class="btn blue">テキストを生成</a>
+    </div>
+    <div class="card image">
+        <img src="static/images/image-gen-icon_64x64.png" alt="Image Generation" class="card-icon">
+        <h2>画像生成</h2>
+        <p>キーワードから画像を生成します</p>
+        <a href="{{ url_for('root.image_gen') }}" class="btn purple">画像を生成</a>
+    </div>
+    <div class="card edit">
+        <img src="static/images/image-edit-icon_64x64.png" alt="Image Editing" class="card-icon">
+        <h2>画像編集</h2>
+        <p>画像を編集・加工します</p>
+        <a href="#" class="btn blue">画像を編集</a>
+    </div>
+</section>
+{% endblock %}

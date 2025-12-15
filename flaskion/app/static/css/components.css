@@ -54,3 +54,9 @@ button:hover {
 button:active {
     transform: scale(0.95);
 }
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 0.5rem;
+}

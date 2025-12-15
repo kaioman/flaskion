@@ -105,6 +105,15 @@ body {
     border-radius: 6px;
 }
 
+.footer {
+    background-color: #f5f5f5;
+    color: #333;
+    text-align: center;
+    padding: 0.1rem;
+    font-size: 0.9rem;
+    border-top: 1px solid #ccc;
+}
+
 .icon {
     font-size: 2rem;
     margin-bottom: 1rem;
@@ -122,11 +131,19 @@ body {
 .btn.blue {
     background-color: #4888ff;
     color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    display: inline-block;
 }
 
 .btn.purple {
     background-color: #ae6fe9;
     color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    display: inline-block;
 }
 
 @media (max-width: 600px) {

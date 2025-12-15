@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Uwgen{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <!-- サイトロゴ -->
+        <div class="logo">
+            <a href="{{ url_for('root.index') }}">
+                <img src="{{ url_for('static', filename='images/uwgen_logo_black_bg_transparent.png') }}" alt="Uwgen">
+            </a>
+        </div>
+        <!-- ナビゲーションボタン -->
+        <nav class="nav">
+            <a href="#">テキスト生成</a>
+            <a href="{{ url_for('root.image_gen') }}">画像生成</a>
+            <a href="#">画像編集</a>
+        </nav>
+        <!-- サインイン -->
+        <div class="signin">サインイン</div>
+    </header>
+
+    <!-- コンテンツエリア -->
+    {% block content %}{% endblock %}
+
+    <!-- フッター -->
+    <footer class="footer">
+        <p>Uwgen - 設計は契約、拡張は前提</p>
+    </footer>
+</body>
+</html>

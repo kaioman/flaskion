@@ -1,0 +1,19 @@
+
+<!-- ドロップダウン共通 -->
+{% macro render_select(id, name, options, selected=None, display="name") %}
+<div class="form-row">
+    <label for="{{ id }}">{{ name }}</label>
+    <select id="{{ id }}" name="{{ id }}">
+        {% for opt in options %}
+            <option value="{{ opt.value }}"
+                {% if selected == opt.value %}selected{% endif %}>
+                {% if display == "name" %}
+                    {{ opt.name }}
+                {% elif display == "name_value" %}
+                    {{ opt.name }} ({{ opt.value }})
+                {% endif %}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+{% endmacro %}

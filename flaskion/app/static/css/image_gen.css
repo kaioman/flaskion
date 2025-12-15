@@ -1,0 +1,77 @@
+.gen-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.gen-form .form-row {
+    margin-bottom: 1rem;
+}
+
+.gen-form textarea,
+.gen-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px soled #000;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.gen-form .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.gen-form .actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 2rem;
+}
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.result {
+    margin-top: 2rem;
+}
+
+.result-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.result-card {
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.result-img {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .gen-form .grid-2 {
+        grid-template-columns: 1fr;
+    }
+    .result-card {
+        grid-template-columns: 1fr;
+    }
+}

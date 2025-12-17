@@ -8,6 +8,7 @@ services:
       - FLASK_APP=server:app
       - DEBUG_PORT=5150
       - DEBUGPY=true
+      - PYDEVD_DISABLE_FILE_VALIDATION=1 # frozen modulesチェックスキップ(再起動時の警告抑止)
     entrypoint: [
       "/var/docker-flask/flaskion/env/bin/python", 
       "-Xfrozen_modules=off", 

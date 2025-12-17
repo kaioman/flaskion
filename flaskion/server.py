@@ -12,9 +12,6 @@ if os.getenv("DEBUGPY", "false").lower() == "true":
         print(f"🚀[debugpy] Preparing to open listner on port {debug_port}")
         # デバッグポートlisten
         debugpy.listen(("0.0.0.0", debug_port))
-        print(f"🔧[debugpy] Waiting for client connection on port {debug_port}")
-        # クライアントからの接続待機
-        debugpy.wait_for_client()
         print(f"✅[debugpy] Client connected. Continuing execution.")
 
 from app.main import app # noqa: F401

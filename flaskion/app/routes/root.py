@@ -8,7 +8,7 @@ root_bp = Blueprint('root', __name__)
 @root_bp.route("/")
 def index():
     """
-    インデックスページを表示するルート
+    インデックスページを表示するルート 
     
     Returns
     -------

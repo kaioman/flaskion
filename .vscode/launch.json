@@ -5,11 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "debugpy",
+            "request": "attach",
+            "name": "Attach to Flask (Docker)",
+            "connect": {
+                "host": "localhost",
+                "port": 5150
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/flaskion",
+                    "remoteRoot": "/var/docker-flask/flaskion"
+                }
+            ]
+        },
+        {
             "type": "chrome",
             "request": "launch",
             "name": "localhost に対して Chrome を起動する",
             "url": "http://localhost:5100",
             "webRoot": "${workspaceFolder}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug Flask + Chrome",
+            "configurations": [
+                "Attach to Flask (Docker)",
+                "localhost に対して Chrome を起動する"
+            ]
         }
     ]
 }

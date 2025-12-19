@@ -1,3 +1,5 @@
+import { ResponseModel } from "./models.js";
+
 /**
  * HTTP通信を行うためのユーティリティクラス
  * GETとPOSTをサポートする
@@ -8,7 +10,7 @@ export class HttpClient {
      * POSTリクエストを送信する
      * @param {*} url  - リクエスト先のURL
      * @param {*} payload  - 送信するデータ(JSON形式)
-     * @returns {Promise<object>} - サーバーから返却されたJSONレスポンス
+     * @returns {Promise<ResponseModel>} - サーバーから返却されたJSONレスポンス
      */
     static async post(url, payload) {
         try {
@@ -20,10 +22,15 @@ export class HttpClient {
             });
             
             // レスポンスチェック
-            const data = await response.json();
+            const body = await response.json();
 
             // レスポンスをJSONとして返却
-            return { status: response.status, body: data };
+            return new ResponseModel({
+                status: response.status,
+                body,
+                headers: response.headers,
+            });
+
         } catch (error) {
             // 通信エラーやサーバーエラーを呼び出し元に伝える
             throw error;
@@ -41,38 +48,13 @@ export class HttpClient {
             const response = await fetch(url, { method: "GET" });
             
             // レスポンスチェック
-            const data = await response.json();
+            const body = await response.json();
 
             // レスポンスをJSONとして返却する
-            return { status: response.status, body: data };
+            return { status: response.status, body: body };
         } catch (error) {
             // 通信エラーやサーバーエラーを呼び出し元に伝える
             throw error;
         }
     }
-}
-
-/**
- * HTTP ステータスコード
- */
-export const HttpStatus = {
-
-    // リクエスト成功
-    OK: 200,
-
-    // クライアント側の入力エラー（バリデーションエラーなど）
-    BAD_REQUEST: 400,
-
-    // 認証が必要（ログインしていない）
-    UNAUTHORIZED: 401,
-
-    // 認可エラー（ログインしていても権限が足りない）
-    FORBIDDEN: 403,
-
-    // リソースが存在しない
-    NOT_FOUND: 404,
-
-    // サーバー内部エラー（予期しない例外など）
-    INTERNAL_SERVER_ERROR: 500,
-
 }

@@ -1,5 +1,6 @@
-import { HttpClient, HttpStatus } from "./utils.js";
-import { MessageManager, MessageType } from "./components.js";
+import { HttpClient } from "./utils.js";
+import { MessageType } from "./constants.js";
+import { MessageManager } from "./components.js";
 
 /**
  * ページロード時処理
@@ -97,15 +98,15 @@ function setupImageGenerateion() {
 
         try {
             // サーバーにPOSTリクエストを送信して結果を受け取る
-            const {status, body} = await HttpClient.post("/get_gen_image", payload);
+            const response = await HttpClient.post("/get_gen_image", payload);
 
             // 結果リストをクリア
             msgMgr.clear();
 
             // Httpリクエストコード判定
-            if (status == HttpStatus.OK) {
+            if (response.isOk()) {
 
-                body.generated.forEach(path => {
+                response.body.generated.forEach(path => {
                     
                     // カードテンプレート複製
                     const card = template.content.cloneNode(true);
@@ -128,12 +129,12 @@ function setupImageGenerateion() {
                 // 成功メッセージ表示
                 msgMgr.show("画像生成処理が成功しました", MessageType.SUCCESS, "成功");
 
-            } else if (status == HttpStatus.BAD_REQUEST) {
+            } else if (response.isBadRequest()) {
                 // プロンプト未入力メッセージ表示
-                msgMgr.show(body.error, MessageType.WARNING, "入力エラー", status);
+                msgMgr.show(response.body.error, MessageType.WARNING, "入力エラー", response.status);
             } else {
                 // 内部エラーメッセージ表示
-                msgMgr.show(body.error, MessageType.ERROR, "サーバー側でエラーが発生しました", status);
+                msgMgr.show(response.body.error, MessageType.ERROR, "サーバー側でエラーが発生しました", response.status);
             }
         } catch (err) {
             msgMgr.show(err, MessageType.ERROR, "通信エラーが発生しました");

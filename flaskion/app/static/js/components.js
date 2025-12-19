@@ -1,13 +1,4 @@
-
-/**
- * メッセージタイプ
- */
-export const MessageType = {
-    ERROR: "error",
-    WARNING: "warning",
-    SUCCESS: "success",
-    INFO: "info",
-};
+import { MessageType } from "./constants.js";
 
 /**
  * メッセージマネージャー

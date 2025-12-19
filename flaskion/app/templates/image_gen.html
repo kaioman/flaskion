@@ -28,13 +28,6 @@
                 placeholder="プロンプトを入力"></textarea>
         </div>
 
-        <!-- エラーメッセージ -->
-        {% if error %}
-        <div class="form-row error">
-            <p class="error-message">{{ error }}</p>
-        </div>
-        {% endif %}
-
         <!-- 生成条件 -->
         <div class="form-grid">
             <!-- モデル -->
@@ -64,6 +57,7 @@
     <!-- 結果表示エリア -->
     <section class="result">
         <h2>生成結果</h2>
+        <div class="message-area"></div>
         <div class="result-list"></div>
     </section>
 

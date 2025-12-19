@@ -1,4 +1,5 @@
 import { HttpClient, HttpStatus } from "./utils.js";
+import { MessageManager, MessageType } from "./components.js";
 
 /**
  * ページロード時処理
@@ -44,14 +45,13 @@ function setupImageGenerateion() {
     const form = document.querySelector(".gen-form");
     const generateBtn = document.getElementById("generateBtn");
     const overlay = document.getElementById("overlay");
+    const messageArea = document.querySelector(".message-area");
     const resultList = document.querySelector(".result-list");
     /** @type {HTMLTemplateElement} */
     const template = document.getElementById("result-card-template");
 
-    // エラー表示
-    const showError = (msg) => {
-        resultList.innerHTML = `<p class="error-message">${msg}</p>`;
-    };
+    // メッセージマネージャーインスタンス
+    const msgMgr = new MessageManager(messageArea);
 
     // 画像パス取得
     const extractRelativePath = (path) =>
@@ -100,8 +100,8 @@ function setupImageGenerateion() {
             const {status, body} = await HttpClient.post("/get_gen_image", payload);
 
             // 結果リストをクリア
-            resultList.innerHTML = "";
-            
+            msgMgr.clear();
+
             // Httpリクエストコード判定
             if (status == HttpStatus.OK) {
 
@@ -124,14 +124,19 @@ function setupImageGenerateion() {
                     // DOMに追加
                     resultList.appendChild(card);
                 });
-            } else if (status == HttpStatus.BAD_REQUEST) {
-                showError(body.error);
+                
+                // 成功メッセージ表示
+                msgMgr.show("画像生成処理が成功しました", MessageType.SUCCESS, "成功");
 
+            } else if (status == HttpStatus.BAD_REQUEST) {
+                // プロンプト未入力メッセージ表示
+                msgMgr.show(body.error, MessageType.WARNING, "入力エラー", status);
             } else {
-                showError(body.error);
-            }            
+                // 内部エラーメッセージ表示
+                msgMgr.show(body.error, MessageType.ERROR, "サーバー側でエラーが発生しました", status);
+            }
         } catch (err) {
-            showError("通信エラーが発生しました");
+            msgMgr.show(err, MessageType.ERROR, "通信エラーが発生しました");
             console.error(err);
         } finally {
             overlay.style.display = "none";

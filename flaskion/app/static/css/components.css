@@ -51,11 +51,84 @@ button:active {
     transform: scale(0.95);
 }
 
-/* エラーメッセージ */
-.error-message {
-    color: red;
+/* メッセージボックス(共通スタイル) */
+.message-box {
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* エラー(赤) */
+.message-box.error {
+    background: #ffe5e5;
+    border-left: 6px solid #e53935;
+    color: #b71c7c
+}
+.message-box.error .title::before {
+    content: "❌";
+    margin-right: 6px;
+}
+
+/* 警告(黄色) */
+.message-box.warning {
+    background: #fff8e1;
+    border-left: 6px solid #ffb300;
+    color: #8d6e00;
+}
+.message-box.warning .title::before {
+    content: "⚠️";
+    margin-right: 6px;
+}
+
+/* 成功(緑色) */
+.message-box.success {
+    background: #e8f5e9;
+    border-left: 6px solid #43a047;
+    color: #0d47a1;
+}
+.message-box.success .title::before {
+    content: "✔️";
+    margin-right: 6px;
+}
+
+/* 情報(青色) */
+.message-box.info {
+    background: #e3f2fd;
+    border-left: 6px solid #1e88e5;
+    color: #0d47a1;
+}
+.message-box.info .title::before {
+    content: "ℹ️";
+    margin-right: 6px;
+}
+
+/* 共通タイトル */
+.message-box .title {
     font-weight: bold;
-    margin-top: 0.5rem;
+    font-size: 15px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+}
+
+/* 共通メッセージ */
+.message-box .message {
+    margin-left: 22px;
 }
 
 /* オーバーレイ */

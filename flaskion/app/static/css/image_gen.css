@@ -40,6 +40,11 @@
     }
 }
 
+.message-area {
+    margin-bottom: 16px;
+    min-height: 0;
+}
+
 .result {
     margin-top: 2rem;
 }

@@ -1,8 +1,26 @@
+import { HttpClient, HttpStatus } from "./utils.js";
+
+/**
+ * ページロード時処理
+ */
 document.addEventListener("DOMContentLoaded", function() {
+    
+    // 入力チェック、リセット処理
+    setupValidation();
+
+    // 画像生成ボタンの非同期処理
+    setupImageGenerateion();
+
+});
+
+/**
+ * 入力チェック、リセット処理
+ */
+function setupValidation() {
     const form = document.querySelector(".gen-form");
     const promptInput = form.querySelector("#prompt");
     const errorEl = form.querySelector(".error-message");
-
+    
     // リセット時にエラーをクリアする
     form.addEventListener("reset", function() {
         if (errorEl) {
@@ -17,4 +35,107 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-});
+}
+
+/**
+ * 画像生成ボタンの非同期処理
+ */
+function setupImageGenerateion() {
+    const form = document.querySelector(".gen-form");
+    const generateBtn = document.getElementById("generateBtn");
+    const overlay = document.getElementById("overlay");
+    const resultList = document.querySelector(".result-list");
+    /** @type {HTMLTemplateElement} */
+    const template = document.getElementById("result-card-template");
+
+    // エラー表示
+    const showError = (msg) => {
+        resultList.innerHTML = `<p class="error-message">${msg}</p>`;
+    };
+
+    // 画像パス取得
+    const extractRelativePath = (path) =>
+        `/static/${path.split('static/')[1]}`;
+
+    // 生成結果クリック時イベントハンドラ追加
+    resultList.addEventListener("click", (e) =>{
+
+        // ボタン取得
+        const btn = e.target.closest("button");
+        if (!btn) return;
+
+        // カード取得
+        const card = btn.closest(".result-card");
+        if (!card) return;
+
+        // 画像パス取得
+        const relative = card.dataset.path;
+        if (!relative) return;
+
+        // ダウンロードボタンクリック時
+        if (btn.classList.contains("download-btn")) {
+            const a = document.createElement("a");
+            a.href = relative;
+            a.download = "";
+            a.click();
+        }
+
+        // URLコピーボタンクリック時
+        if (btn.classList.contains("urlcopy-btn")) {
+            navigator.clipboard.writeText(`${location.origin}${relative}`);
+        }
+
+    });
+
+    // 生成ボタンクリック時イベントハンドラ追加
+    generateBtn.addEventListener("click", async function() {
+        overlay.style.display = "flex";
+        generateBtn.disabled = true;
+
+        // 入力値を回収
+        const payload = Object.fromEntries(new FormData(form));
+
+        try {
+            // サーバーにPOSTリクエストを送信して結果を受け取る
+            const {status, body} = await HttpClient.post("/get_gen_image", payload);
+
+            // 結果リストをクリア
+            resultList.innerHTML = "";
+            
+            // Httpリクエストコード判定
+            if (status == HttpStatus.OK) {
+
+                body.generated.forEach(path => {
+                    
+                    // カードテンプレート複製
+                    const card = template.content.cloneNode(true);
+                    
+                    // 画像パス取得
+                    const relative = extractRelativePath(path);
+
+                    // 画像設定
+                    const img = card.querySelector(".result-img");
+                    img.src = relative;
+
+                    // カードにパスを保持
+                    const root = card.querySelector(".result-card");
+                    root.dataset.path = relative;
+
+                    // DOMに追加
+                    resultList.appendChild(card);
+                });
+            } else if (status == HttpStatus.BAD_REQUEST) {
+                showError(body.error);
+
+            } else {
+                showError(body.error);
+            }            
+        } catch (err) {
+            showError("通信エラーが発生しました");
+            console.error(err);
+        } finally {
+            overlay.style.display = "none";
+            generateBtn.disabled = false;
+        }
+    })
+}

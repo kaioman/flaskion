@@ -1,9 +1,42 @@
+from flask import jsonify
+from http import HTTPStatus
+from pydantic import ValidationError
 from pycorex.gemini_client import GeminiClient
+from ..models.image_gen_params import ImageGenParams
 
-def generate_image(prompt: str) -> list[str]:
-    results: list[str] = []
+# def generate_image(params: ImageGenParams) -> list[str]:
+#     # results: list[str] = [
+#     #     "static/generated/test001.png",
+#     #     "static/generated/test002.png",
+#     #     "static/generated/test003.png",
+#     #     "static/generated/test004.png",
+#     #     "static/generated/test005.png"
+#     # ]
+#     results: list[str] = [
+#         "static/generated/test004.png",
+#         "static/generated/test005.png"
+#     ]
+#     # GeminiClient
+#     return results
+
+def generate_image(param_data: dict):
+    try:
+        # フォームの入力値をパラメーターモデルクラスに設定する
+        params = ImageGenParams(**param_data)
+    except ValidationError as e:
+        return jsonify({"error": e.errors()}), HTTPStatus.BAD_GATEWAY
+    
+    # プロンプト入力チェック
+    if not params.prompt:
+        error_message = "プロンプトを入力してください"
+        return jsonify({"error": error_message}), HTTPStatus.BAD_GATEWAY
+    
+    results: list[str] = [
+        "static/generated/test004.png",
+        "static/generated/test005.png"
+    ]
     # GeminiClient
-    return results
+    return jsonify({"generated": results}), HTTPStatus.OK
 
 def get_models():
     return GeminiClient.GeminiModel

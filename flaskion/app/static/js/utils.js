@@ -1,4 +1,3 @@
-
 /**
  * HTTP通信を行うためのユーティリティクラス
  * GETとPOSTをサポートする
@@ -20,13 +19,11 @@ export class HttpClient {
                 body: JSON.stringify(payload)
             });
             
-            // レスポンスチェック。正常でない場合はエラーを投げる
-            if (!response.ok) {
-                throw new Error("Server Error: " + response.status);
-            }
-            
+            // レスポンスチェック
+            const data = await response.json();
+
             // レスポンスをJSONとして返却
-            return await response.json();
+            return { status: response.status, body: data };
         } catch (error) {
             // 通信エラーやサーバーエラーを呼び出し元に伝える
             throw error;
@@ -39,15 +36,43 @@ export class HttpClient {
      * @returns {Promise<object>} - サーバーから返却されたJSONレスポンス
      */
     static async get(url) {
-        // fetch APIでGETリクエストを送信
-        const response = await fetch(url, { method: "GET" });
-        
-        // レスポンスチェック。正常でない場合はエラーを投げる
-        if (!response.ok) {
-            throw new Error("Server Error: " + response.status);
-        }
+        try {
+            // fetch APIでGETリクエストを送信
+            const response = await fetch(url, { method: "GET" });
+            
+            // レスポンスチェック
+            const data = await response.json();
 
-        // レスポンスをJSONとして返却する
-        return await response.json();
+            // レスポンスをJSONとして返却する
+            return { status: response.status, body: data };
+        } catch (error) {
+            // 通信エラーやサーバーエラーを呼び出し元に伝える
+            throw error;
+        }
     }
+}
+
+/**
+ * HTTP ステータスコード
+ */
+export const HttpStatus = {
+
+    // リクエスト成功
+    OK: 200,
+
+    // クライアント側の入力エラー（バリデーションエラーなど）
+    BAD_REQUEST: 400,
+
+    // 認証が必要（ログインしていない）
+    UNAUTHORIZED: 401,
+
+    // 認可エラー（ログインしていても権限が足りない）
+    FORBIDDEN: 403,
+
+    // リソースが存在しない
+    NOT_FOUND: 404,
+
+    // サーバー内部エラー（予期しない例外など）
+    INTERNAL_SERVER_ERROR: 500,
+
 }

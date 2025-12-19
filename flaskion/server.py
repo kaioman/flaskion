@@ -9,7 +9,7 @@ if os.getenv("DEBUGPY", "false").lower() == "true":
         
         # デバッグポート取得
         debug_port = int(os.getenv("DEBUG_PORT", "5150"))
-        print(f"🚀[debugpy] Preparing to open listner on port {debug_port}")
+        print(f"🚀[debugpy] Preparing to open listener on port {debug_port}")
         # デバッグポートlisten
         debugpy.listen(("0.0.0.0", debug_port))
         print(f"✅[debugpy] Client connected. Continuing execution.")

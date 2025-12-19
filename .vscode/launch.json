@@ -24,7 +24,7 @@
             "request": "launch",
             "name": "localhost に対して Chrome を起動する",
             "url": "http://localhost:5100",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}/flaskion/app"
         }
     ],
     "compounds": [

@@ -51,34 +51,33 @@
 
         <!-- ボタンエリア -->
         <div class="form-row actions">
-            <button class="btn blue" type="submit">生成する</button>
+            <button id="generateBtn" class="btn blue">生成する</button>
             <button class="btn" type="reset">リセット</button>
+        </div>
+
+        <!-- オーバーレイ + スピナー -->
+        <div id="overlay" class="overlay" style="display:none;">
+            <div class="spinner"></div>
         </div>
     </form>
 
     <!-- 結果表示エリア -->
-    {% if generated %}
     <section class="result">
         <h2>生成結果</h2>
-        <div class="result-list">
-            {% for path in generated %}
-            <div class="result-card">
-                <img src="{{ url_for('static', filename=path.split('static/', 1)[1]) }}"
-                    alt="生成画像" class="result-img">
-                <div class="result-meta">
-                    <a href="{{ url_for('static', filename=path.split('static/', 1)[1]) }}"
-                        class="btn purple" download>ダウンロード</a>
-                    <button class="btn"
-                        onclick="navigator.clipboard.writeText('{{ request.url_root }}{{ url_for('static', filename=path.split('static/', 1)[1]) }}')">
-                        URLをコピー
-                    </button>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <div class="result-list"></div>
     </section>
-    {% endif %}
+
+    <!-- 結果カードのテンプレート-->
+    <template id="result-card-template">
+        <div class="result-card">
+            <img class="result-img" alt="生成画像">
+            <div class="result-meta">
+                <button class="btn download-btn">ダウンロード</button>
+                <button class="btn urlcopy-btn">URLをコピー</button>
+            </div>
+        </div>
+    </template>
 </main>
 <!-- JS 読込 -->
-<script src="{{ url_for('static', filename='js/image_gen.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/image_gen.js') }}"></script>
 {% endblock %}

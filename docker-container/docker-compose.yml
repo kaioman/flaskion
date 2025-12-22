@@ -12,5 +12,20 @@ services:
     environment:
       - FLASK_ENV=production
     command: ./env/bin/gunicorn -w 4 -k gevent -b 0.0.0.0:5100 server:app
+
+  uwgen_db:
+    restart: always
+    image: postgres:12
+    container_name: pg12_uwgen
+    ports:
+      - "5201:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ../pg12_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    
 volumes:
   env:

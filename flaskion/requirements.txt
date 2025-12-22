@@ -7,3 +7,4 @@ gunicorn
 gevent
 pycorex
 pydbx-hng
+psycopg2-binary

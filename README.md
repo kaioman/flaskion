@@ -144,3 +144,96 @@ Once the container is running with `debugpy` enabled and the port exposed:
 6. To stop debugging, simply stop the session in VSCode. The Flask app continues running inside the container.
 
 > 💡Tip: If you want to  debug both backend and frontend together, choose the compound configuration **Debug Flask + Chrome**. This will attach to the Flask process and simultaneously launch Chrome pointing to `http://localhost:5100`.
+
+## Database Migration with Alembic
+
+Flaskion use **Alembic** to manage database schema migrations in a consistent and reproducible way.
+This section describes how to install, initialize, and run Alembic inside the Docker-based development environment.
+
+### 1. Install Alembic (container)
+
+Enter the Flaskion container and install Alembic into the virtual environment:
+
+```bash
+docker exec -it <container_name> bash
+source .env/bin/activate
+pip install alembic
+```
+
+If you are using a requirements file, also update it:
+
+```bash
+pip freeze > requirements.txt
+```
+
+### 2. Initialize Alembic
+
+Inside the container, initialize Alembic:
+
+```bash
+alembic init alembic
+```
+
+This creates a `alembic/` directory containing:
+
+- `env.py` ー Alembic environment configuration
+- `script.py.mako` ー migration script template
+- `versions/` ー migration files will be stored here
+
+### 3. Configure Alembic(`alembic.ini` and `env.py`)
+
+Update `alembic.ini` to point to your database URL.
+If Flaskion loads the DB URL from environment variables, set:
+
+```Ini
+sqlalchemy.url = ${DATABASE_URL}
+```
+
+Then modify `alembic/env.py` to load the SQLAlchemy `Base` from your application:
+
+```Python
+from flaskion.db import Base  # adjust import path as needed
+target_metadata = Base.metadata
+```
+
+This ensures Alembic can autogenerate migrations based on your models.
+
+### 4. Create a Migration
+
+To generate a migration based on model changes:
+
+```bash
+alembic revision --autogenerate -m "describe your change"
+```
+
+Alembic will create a new file under `alembic/versions/`.
+Review the generated migration script to ensure correctness.
+
+### 5. Apply Migrations
+
+Run migrations inside the container:
+
+```bash
+alembic upgrade head
+```
+
+To downgrade:
+
+```bash
+alembic downgrade -1
+```
+
+### 6. Running Alembic in Docker Compose
+
+If you want Alembic to run automatically on container startup (optional),
+add a command to your `docker-compose.override.yml`:
+
+```yaml
+command: >
+  bash -c "
+    alembic upgrade head &&
+    flask run --host=0.0.0.0 --port=5100
+  "
+```
+
+This ensures the database schema is always up-to-date in development.

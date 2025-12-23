@@ -8,3 +8,7 @@ gevent
 pycorex
 pydbx-hng
 psycopg2-binary
+marshmallow
+dotenv
+bcrypt
+pyjwt

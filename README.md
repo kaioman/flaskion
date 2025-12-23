@@ -237,3 +237,24 @@ command: >
 ```
 
 This ensures the database schema is always up-to-date in development.
+
+## Project Structure
+
+```text
+app/
+  ├── api/
+  │    └── v1/
+  │         └── auth.py              ← signup / signin endpoints
+  ├── services/
+  │    └── auth_service.py           ← business logic（db, auth）
+  ├── models/
+  │    └── user.py                   ← SQLAlchemy User model
+  ├── schemas/
+  │    └── auth.py                   ← Marshmallow request/response schema
+  ├── core/
+  │    ├── security.py               ← password hashing, JWT
+  │    └── config.py                 ← settings
+  ├── db/
+  │    └── session.py                ← SQLAlchemy session management
+  └── __init__.py                    ← Flask app initialization
+```

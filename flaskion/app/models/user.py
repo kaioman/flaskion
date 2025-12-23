@@ -1,13 +1,12 @@
 from sqlalchemy import Column, String, Boolean, TIMESTAMP, text
 from sqlalchemy.dialects.postgresql import UUID
-from pydbx_hng.models.base.base_model import Base
+from pydbx_hng.models.base.base_model import BaseModel
 
-class User(Base):
+class User(BaseModel):
     """
     ユーザー情報を管理するモデル
     
     - アプリケーション内でユーザー情報を扱うためのORMモデル
-    - DBのテーブル構造をPythonクラスとして定義する
     """
     
     # テーブル名指定
@@ -39,11 +38,11 @@ class User(Base):
     is_active = Column(
         Boolean,
         nullable=False,
-        server_default="true"
+        server_default=text("true")
     )
     
     # 作成日時(デフォルトは現在時刻)
-    create_at = Column(
+    created_at = Column(
         TIMESTAMP(timezone=True),
         nullable=False,
         server_default=text("NOW()")

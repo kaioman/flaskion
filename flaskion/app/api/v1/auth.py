@@ -1,9 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
+from http import HTTPStatus
 from app.schemas.auth import (
     SignupRequestSchema, SignupResponseSchema,
     SigninRequestSchema, SigninResponseSchema
 )
 from app.services.auth_service import AuthService
+from app.core.errors import AuthError, RequestError
+from app.models.response.errors import ErrorResponse
+from app.models.response.success import SuccessResponse
 
 # Blueprintの作成
 bp = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
@@ -18,17 +22,19 @@ def signup():
     data = request.get_json()
     errors = SignupRequestSchema().validate(data)
     if errors:
-        return jsonify({"errors": "invalid_request", "message": errors}), 400
-    
+        return ErrorResponse.from_error(RequestError.INVALID_REQUEST, HTTPStatus.BAD_REQUEST, details=errors)
+
     # サインアップ処理
     user, err = AuthService.signup(data["email"], data["password"])
-    if err == "email_exists":
-        return jsonify({"errors": "email_exists", "message": "This email is already registered."}), 409
-    
-    # レスポンス生成
-    response = SignupResponseSchema().dump(user)
-    return jsonify(response), 201
+    if err == AuthError.EMAIL_EXISTS:
+        return ErrorResponse.from_error(AuthError.EMAIL_EXISTS, HTTPStatus.CONFLICT)
 
+    # レスポンス生成
+    return SuccessResponse.ok(
+        SignupResponseSchema().dump(user),
+        status=HTTPStatus.CREATED
+    )
+    
 @bp.post("/signin")
 def signin():
     """
@@ -36,21 +42,23 @@ def signin():
     """
     
     # リクエストデータ検証
-    data = request.get_json()
+    data = request.get_json() or {}
     errors = SigninRequestSchema().validate(data)
     if errors:
-        return jsonify({"errors": "invalid_request", "message": errors}), 400
+        #return jsonify({"errors": RequestError.INVALID_REQUEST.value, "message": RequestError.INVALID_REQUEST.message, "details": errors}), HTTPStatus.BAD_REQUEST
+        return ErrorResponse.from_error(RequestError.INVALID_REQUEST, HTTPStatus.BAD_REQUEST, details=errors)
 
     # サインイン処理
     token, err = AuthService.signin(data["email"], data["password"])
-    if err == "invalid_credentials":
-        return jsonify({"errors": "invalid_credentials", "message": "Invalid email or password."}), 401
-    if err == "inactive_account":
-        return jsonify({"errors": "inactive_account", "message": "Account is inactive."}), 403
-    
+    if err == AuthError.INVALID_CREDENTIALS:
+        return ErrorResponse.from_error(AuthError.INVALID_CREDENTIALS, HTTPStatus.UNAUTHORIZED)
+    if err == AuthError.INACTIVE_ACCOUNT:
+        return ErrorResponse.from_error(AuthError.INACTIVE_ACCOUNT, HTTPStatus.FORBIDDEN)
+
     # レスポンス生成
-    response = SigninResponseSchema().dump({
-        "access_token": token,
-        "token_type": "Bearer"
-    })
-    return jsonify(response), 200
+    return SuccessResponse.ok(
+        SigninResponseSchema().dump({
+            "access_token": token,
+            "token_type": "Bearer"
+        })
+    )

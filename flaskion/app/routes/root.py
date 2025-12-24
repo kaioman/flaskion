@@ -34,7 +34,7 @@ def image_gen():
     """
     
     # 各種列挙体を取得
-    gemini_models = img_srv.get_models()
+    gemini_models = img_srv.get_image_models()
     image_sizes = img_srv.get_resolutions()
     image_aspects = img_srv.get_aspects()
     image_safety_filters = img_srv.get_safety_filters()

@@ -23,8 +23,25 @@ def generate_image(param_data: dict):
     # GeminiClient
     return jsonify({"generated": results}), HTTPStatus.OK
 
-def get_models():
+def get_all_models():
     return GeminiClient.GeminiModel
+
+def get_image_models():
+    return [
+        GeminiClient.GeminiModel.GEMINI_PRO_VISION,
+        GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW
+    ]
+
+def get_text_models():
+    return [
+        GeminiClient.GeminiModel.GEMINI_2_0_FLASH,
+        GeminiClient.GeminiModel.GEMINI_2_0_FLASH_LITE,
+        GeminiClient.GeminiModel.GEMINI_2_5_FLASH,
+        GeminiClient.GeminiModel.GEMINI_2_5_FLASH_IMAGE,
+        GeminiClient.GeminiModel.GEMINI_2_5_FLASH_LITE,
+        GeminiClient.GeminiModel.GEMINI_3_PRO,
+        GeminiClient.GeminiModel.GEMINI_ULTRA,
+    ]
 
 def get_resolutions():
     return GeminiClient.ImageSize

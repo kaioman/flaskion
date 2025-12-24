@@ -37,8 +37,21 @@ body {
     background: transparent;
 }
 
+.auth-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .signin {
     color: #ffffff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.user-icon {
+    width: 28px;
+    height: 28px;
     cursor: pointer;
 }
 

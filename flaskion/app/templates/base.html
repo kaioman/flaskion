@@ -26,7 +26,10 @@
             <a href="#">画像編集</a>
         </nav>
         <!-- サインイン -->
-        <div class="signin">サインイン</div>
+        <div class="auth-area">
+            <a href="#" class="signin">サインイン</a>
+            <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" alt="User Icon" class="user-icon">
+        </div>
     </header>
 
     <!-- コンテンツエリア -->

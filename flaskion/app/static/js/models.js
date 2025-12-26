@@ -29,8 +29,8 @@ export class ResponseModel {
      * 
      * @returns {boolean} 成功なら true
      */
-    isOk() {
-        return this.status == HttpStatus.OK;
+    isSuccess() {
+        return this.status >= HttpStatus.OK && this.status < HttpStatus.REDIRECTION;
     }
 
     /**

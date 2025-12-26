@@ -45,7 +45,6 @@ def signin():
     data = request.get_json() or {}
     errors = SigninRequestSchema().validate(data)
     if errors:
-        #return jsonify({"errors": RequestError.INVALID_REQUEST.value, "message": RequestError.INVALID_REQUEST.message, "details": errors}), HTTPStatus.BAD_REQUEST
         return ErrorResponse.from_error(RequestError.INVALID_REQUEST, HTTPStatus.BAD_REQUEST, details=errors)
 
     # サインイン処理

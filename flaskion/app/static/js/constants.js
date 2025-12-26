@@ -7,6 +7,9 @@ export const HttpStatus = {
     // リクエスト成功
     OK: 200,
 
+    // リダイレクト
+    REDIRECTION: 300,
+
     // クライアント側の入力エラー（バリデーションエラーなど）
     BAD_REQUEST: 400,
 

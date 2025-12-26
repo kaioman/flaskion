@@ -5,10 +5,10 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from pydbx_hng.models.base.base_model import Base
+from pydbx_hng.models.base.base_model import BaseModel
 from app.models.user import User  # noqa: F401
 
-target_metadata = Base.metadata
+target_metadata = BaseModel.metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

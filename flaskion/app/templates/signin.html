@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+<!-- ページタイトル -->
+{% block title %}Signin - Uwgen{% endblock %}
+
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<script type="module" defer src="{{ url_for('static', filename='js/signin.js') }}"></script>
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<div class="auth-container">
+    <!-- タイトル -->
+    <h1 class="auth-title">サインイン</h1>
+
+    <form id="auth-form">
+        <!-- Emailアドレス -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <!-- パスワード -->
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <!-- 続行ボタン -->
+        <button type="submit" class="auth-button">続行</button>
+
+        <!-- オーバーレイ + スピナー -->
+        <div id="overlay" class="overlay" style="display:none;">
+            <div class="spinner"></div>
+        </div>
+
+    </form>
+
+    <!-- サインアップ -->
+    <p class="auth-switch">
+        アカウントがありませんか？
+        <a href="{{ url_for('root.signup') }}">サインアップ</a>
+    </p>
+
+    <!-- APIエラー表示欄 -->
+    <div class="message-area"></div>
+</div>
+{% endblock %}

@@ -21,13 +21,15 @@
         </div>
         <!-- ナビゲーションボタン -->
         <nav class="nav">
-            <a href="#">テキスト生成</a>
-            <a href="{{ url_for('root.image_gen') }}">画像生成</a>
-            <a href="#">画像編集</a>
+            {% if not hide_nav_items %}
+                <a href="#">テキスト生成</a>
+                <a href="{{ url_for('root.image_gen') }}">画像生成</a>
+                <a href="#">画像編集</a>
+            {% endif %}
         </nav>
         <!-- サインイン -->
         <div class="auth-area">
-            <a href="#" class="signin">サインイン</a>
+            <a href="{{ url_for('root.signin') }}" class="signin">サインイン</a>
             <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" alt="User Icon" class="user-icon">
         </div>
     </header>

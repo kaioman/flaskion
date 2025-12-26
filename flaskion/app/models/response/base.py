@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from flask import jsonify
+from flask import jsonify, make_response
 from flask.wrappers import Response
 from typing import Dict, Any, Union
 from http import HTTPStatus
@@ -20,5 +20,6 @@ class BaseResponse(ABC):
         """
         Flask レスポンスを返す
         """
-        
-        return jsonify(self.to_dict()), status
+        response = make_response(jsonify(self.to_dict()), status)
+        response.headers["Content-Type"] = "application/json"
+        return response

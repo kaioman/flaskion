@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+<!-- ページタイトル -->
+{% block title %}Signup - Uwgen{% endblock %}
+
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<script type="module" defer src="{{ url_for('static', filename='js/signup.js') }}"></script>
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<div class="auth-container">
+    <!-- タイトル -->
+    <h1 class="auth-title">サインアップ</h1>
+
+    <form id="auth-form">
+        <!-- Emailアドレス -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <!-- パスワード -->
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <!-- パスワード(確認) -->
+        <div class="form-group">
+            <label for="password_confirm">Password(確認)</label>
+            <input type="password" id="password_confirm" required>
+        </div>
+
+        <!-- 続行ボタン -->
+        <button type="submit" id="create_account" class="auth-button">アカウントを作成</button>
+
+        <!-- オーバーレイ + スピナー -->
+        <div id="overlay" class="overlay" style="display:none;">
+            <div class="spinner"></div>
+        </div>
+
+    </form>
+
+    <!-- サインインへの導線-->
+    <p class="auth-switch">
+        すでにアカウントがありますか？
+        <a href="{{ url_for('root.signin') }}">サインイン</a>
+    </p>
+
+    <!-- APIエラー表示欄 -->
+    <div class="message-area"></div>
+</div>
+{% endblock %}

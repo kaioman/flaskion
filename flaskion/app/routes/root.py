@@ -6,7 +6,7 @@ from ..services import image_service as img_srv
 # Blueprint定義
 root_bp = Blueprint('root', __name__)
 
-@root_bp.route("/")
+@root_bp.get("/")
 def index():
     """
     インデックスページを表示するルート 
@@ -18,7 +18,15 @@ def index():
     """
     return render_template("index.html")
 
-@root_bp.route("/image_gen", methods=["GET", "POST"])
+@root_bp.get("/signin")
+def signin():
+    return render_template("signin.html", hide_nav_items=True)
+
+@root_bp.get("/signup")
+def signup():
+    return render_template("signup.html", hide_nav_items=True)
+
+@root_bp.get("/image_gen")
 def image_gen():
     """
     画像生成ページを表示するルート

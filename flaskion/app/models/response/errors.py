@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from flask import jsonify
 from flask.wrappers import Response
 from typing import Any, Optional, Dict, Union
 from http import HTTPStatus
-from app.core.errors import BaseErrorEnum
 from app.models.response.base import BaseResponse
+from app.core.errors import ErrorEnumProtocol
+from app.core.error_messages import get_error_message
 
 @dataclass
 class ErrorResponse(BaseResponse):
@@ -45,7 +45,7 @@ class ErrorResponse(BaseResponse):
         return data
         
     @classmethod
-    def from_error(cls, err_enum: BaseErrorEnum, status: Union[int, HTTPStatus], details: Optional[Dict[str, Any]]=None) -> Response:
+    def from_error(cls, err_enum: ErrorEnumProtocol, status: Union[int, HTTPStatus], details: Optional[Dict[str, Any]]=None) -> Response:
         """
         エラー情報を元に ErrorResponse インスタンスを生成する
         
@@ -65,6 +65,6 @@ class ErrorResponse(BaseResponse):
         """
         return cls(
             errors=err_enum.value,
-            message=err_enum.message,
+            message=get_error_message(err_enum),
             details=details
         ).to_response(status)

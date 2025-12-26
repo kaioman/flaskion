@@ -1,27 +1,35 @@
 from enum import Enum
-from typing import Dict, TypeVar, Generic
+from typing import Protocol
 
-# Generic 型変数
-#E = TypeVar("E", bound="BaseErrorEnum")
-
-class BaseErrorEnum(str, Enum):
+class ErrorEnumProtocol(Protocol):
     """
-    エラーコードとメッセージを一元管理するための基底クラス
-    各派生クラスは messages 辞書を定義すること
+    エラー用Enumが満たすべきインターフェースを定義するProtocol
+    このProtocolはエラーコードを表すEnumが必ず以下2つの属性を
+    持つことを保証する
+    
+    Attributes
+    ----------
+    value : str
+        Enum メンバーの識別子（エラーコード）。通常は文字列
+    message : str
+        エラーコードに対応するユーザー向けメッセージ
+        
+    Notes
+    -----
+    - このProtocolは継承される必要はない
+        AuthErrorやRequestErrorはこのProtocolを継承しなくても
+        `value`と`message`を持っていれば自動的に適合する
+    - これにより、ErrorResponseなどの関数は「valueとmessageを持つもの」
+        という契約に基づいて型安全に動作可能
     """
+    
+    # Enumメンバーの値（エラーコード）
+    value: str
+    
+    # エラーコードに対応するメッセージ
+    message: str
 
-    # 派生クラス側で上書きされる
-    messages: Dict["BaseErrorEnum", str] = {}
-    
-    @property
-    def message(self) -> str:
-        """
-        Enum メンバーに対応するメッセージを返す
-        派生クラス側で messages 辞書を定義する必要がある
-        """
-        return self.messages[self]
-    
-class AuthError(BaseErrorEnum):
+class AuthError(Enum):
     """
     認証系で発生するエラーコード一覧
     """
@@ -38,15 +46,7 @@ class AuthError(BaseErrorEnum):
     WEAK_PASSWORD = "weak_password"
     """ パスワードが弱すぎる """
     
-    messages = {
-        EMAIL_EXISTS: "This email is already registered.",
-        INVALID_CREDENTIALS: "Invalid email or password.",
-        INACTIVE_ACCOUNT: "Account is inactive.",
-        WEAK_PASSWORD: "The provided password is too weak.",    
-    }
-    """ メッセージ定義 """
-
-class RequestError(BaseErrorEnum):
+class RequestError(Enum):
     """
     リクエスト処理で発生するエラーコード一覧
     """
@@ -54,7 +54,3 @@ class RequestError(BaseErrorEnum):
     INVALID_REQUEST = "invalid_request"
     """ リクエスト無効 """
     
-    messages = {
-        INVALID_REQUEST: "The request payload is invalid.",
-    }
-    """ メッセージ定義 """

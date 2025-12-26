@@ -1,5 +1,4 @@
 from flask import Flask
-from .root import root_bp
 
 def register_routes(app:Flask):
     """
@@ -7,4 +6,11 @@ def register_routes(app:Flask):
     Args:
         app (Flask): Flaskアプリケーションインスタンス
     """
+    
+    # rootルート
+    from .root import root_bp
     app.register_blueprint(root_bp)
+
+    # authルート
+    from app.api.v1.auth import bp as auth_bp
+    app.register_blueprint(auth_bp)

@@ -37,6 +37,7 @@ function setupValidation() {
  */
 function setupSignin() {
     const form = document.getElementById("auth-form");
+    const continueBtn = document.getElementById("continueBtn");
     const messageArea = document.querySelector(".message-area");
     const msgMgr = new MessageManager(messageArea);
 
@@ -47,6 +48,10 @@ function setupSignin() {
 
         // payload取得
         const payload = Object.fromEntries(new FormData(form));
+
+        // 処理中スピナー表示・押下ボタン非活性
+        overlay.style.display = "flex";
+        continueBtn.disabled = true;
 
         try {
             // サインイン処理(非同期)
@@ -66,7 +71,10 @@ function setupSignin() {
                 msgMgr.show("サインインに成功しました", MessageType.SUCCESS, "成功");
 
                 // ルートページに遷移する
-                window.location.href = "/";
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 800);
+                
             } else {
                 // エラーメッセージ表示
                 msgMgr.show(
@@ -84,6 +92,10 @@ function setupSignin() {
                 "通信エラー"
             );
             console.error(err);
+        } finally {
+            // 処理中スピナー非表示・押下ボタン活性
+            overlay.style.display = "none";
+            continueBtn.disabled = false;
         }
     });
 }

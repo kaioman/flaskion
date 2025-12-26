@@ -43,8 +43,6 @@ function setupSignup() {
     const msgMgr = new MessageManager(messageArea);
 
     form.addEventListener("submit", async (e) => {
-        overlay.style.display = "flex";
-        createAccountBtn.disabled = true;
 
         // 標準送信の停止
         e.preventDefault();
@@ -64,6 +62,10 @@ function setupSignup() {
             );
             return;
         }
+        
+        // 処理中スピナー表示・押下ボタン非活性
+        overlay.style.display = "flex";
+        createAccountBtn.disabled = true;
 
         try {
             // APIへPOSTする(非同期)
@@ -104,6 +106,7 @@ function setupSignup() {
             );
             console.error(err);
         } finally {
+            // 処理中スピナー非表示・押下ボタン活性
             overlay.style.display = "none";
             createAccountBtn.disabled = false;
         }

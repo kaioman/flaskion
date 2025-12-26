@@ -1,18 +1,33 @@
 from .errors import AuthError, RequestError
 
 AUTH_ERROR_MESSAGES = {
-    AuthError.EMAIL_EXISTS: "This email is already registered.",
-    AuthError.INVALID_CREDENTIALS: "Invalid email or password.",
-    AuthError.INACTIVE_ACCOUNT: "Account is inactive.",
-    AuthError.WEAK_PASSWORD: "The provided password is too weak.",
+    AuthError.EMAIL_EXISTS: "入力されたEmailアドレスは既に登録されています",
+    AuthError.INVALID_CREDENTIALS: "Emailアドレスまたはパスワードが間違っています",
+    AuthError.INACTIVE_ACCOUNT: "このアカウントは無効です",
+    AuthError.WEAK_PASSWORD: "パスワード強度が低すぎます",
 }
+""" 認証系レスポンスエラーメッセージ """
 
 REQUEST_ERROR_MESSAGE = {
-    RequestError.INVALID_REQUEST: "The request payload is invalid.",
+    RequestError.INVALID_REQUEST: "リクエストの内容が不正です",
 }
+""" リクエスト系エラーメッセージ """
 
-def get_error_message(err):
-
+def get_error_message(err) -> str:
+    """
+    エラーレスポンスクラスごとにメッセージを取得する
+    
+    Parameters
+    ----------
+    err : Enum
+        エラーレスポンスEnum
+    
+    Returns
+    -------
+    str
+        エラーメッセージ
+    """
+    
     # AuthErrorの場合
     if isinstance(err, AuthError):
         return AUTH_ERROR_MESSAGES.get(err, "Unknown authentication error")

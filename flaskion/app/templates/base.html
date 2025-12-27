@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script type="module" defer src="{{ url_for('static', filename='js/base.js') }}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -29,8 +30,19 @@
         </nav>
         <!-- サインイン -->
         <div class="auth-area">
-            <a href="{{ url_for('root.signin') }}" class="signin">サインイン</a>
-            <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" alt="User Icon" class="user-icon">
+            {% if current_user %}
+                <div class="user-menu">
+                    <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" class="user-icon">
+                    <span class="username">{{ current_user.email }}</span>
+                    <div class="dropdown">
+                        <a href="#">設定</a>
+                        <a href="#">ログアウト</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('root.signin') }}" class="signin">サインイン</a>
+                <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" alt="User Icon" class="user-icon">
+            {% endif %}
         </div>
     </header>
 

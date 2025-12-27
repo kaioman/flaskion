@@ -32,6 +32,18 @@ def inject_user():
     """
     return dict(current_user=g.get("current_user"))
 
+@app.teardown_request
+def shutdown_session(exception=None):
+    """
+    リクエスト終了時にSQLAlchemyのセッションをクリーンアップする
+    
+    Parameters
+    ----------
+    exception : Exception | None
+        リクエスト処理中に発生した例外
+    """
+    db.remove()
+
 # ルートを登録
 register_routes(app)
 

@@ -11,6 +11,7 @@ services:
       - ../flaskion:/var/docker-flask/flaskion
     environment:
       - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY}
     command: ./env/bin/gunicorn -w 4 -k gevent -b 0.0.0.0:5100 server:app
 
   uwgen_db:

@@ -54,3 +54,14 @@ class RequestError(Enum):
     INVALID_REQUEST = "invalid_request"
     """ リクエスト無効 """
     
+class UserError(Enum):
+    """
+    ユーザー情報登録処理で発生するエラーコード一覧
+    """
+    
+    USER_NOT_FOUND = "user_not_found"
+    """ ユーザーが見つからない """
+    
+    INVALID_API_KEY = "invalid_api_key"
+    """ APIキーが無効 """
+    

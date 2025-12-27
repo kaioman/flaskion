@@ -69,3 +69,15 @@ class User(BaseModel):
     api_key_updated_at = Column(
         TIMESTAMP(timezone=True)
     )
+
+    # Uwgen APIキー (平文)
+    uwgen_api_key = Column(
+        String,
+        unique=True,
+        nullable=True
+    )
+
+    # Uwgen APIキーの最終更新日時
+    uwgen_api_key_updated_at = Column(
+        TIMESTAMP(timezone=True)
+    )

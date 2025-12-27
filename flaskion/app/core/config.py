@@ -16,6 +16,9 @@ class Settings:
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql+psycopg2://uwgen:uwgen@uwgen_db:5432/uwgen_pg12")
     
+    # Flask session Secret_key
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
+
     # JWT
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change_this_secret")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")

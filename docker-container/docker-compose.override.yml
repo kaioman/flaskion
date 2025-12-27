@@ -9,6 +9,7 @@ services:
       - DEBUG_PORT=5150
       - DEBUGPY=true
       - PYDEVD_DISABLE_FILE_VALIDATION=1 # frozen modulesチェックスキップ(再起動時の警告抑止)
+      - SECRET_KEY=dev-secret-key-20251227 # Flask session secret-key
     entrypoint: [
       "/var/docker-flask/flaskion/env/bin/python", 
       "-Xfrozen_modules=off", 

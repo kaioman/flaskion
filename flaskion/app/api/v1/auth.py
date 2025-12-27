@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 from http import HTTPStatus
 from app.schemas.auth import (
     SignupRequestSchema, SignupResponseSchema,
@@ -48,12 +48,15 @@ def signin():
         return ErrorResponse.from_error(RequestError.INVALID_REQUEST, HTTPStatus.BAD_REQUEST, details=errors)
 
     # サインイン処理
-    token, err = AuthService.signin(data["email"], data["password"])
+    user ,token, err = AuthService.signin(data["email"], data["password"])
     if err == AuthError.INVALID_CREDENTIALS:
         return ErrorResponse.from_error(AuthError.INVALID_CREDENTIALS, HTTPStatus.UNAUTHORIZED)
     if err == AuthError.INACTIVE_ACCOUNT:
         return ErrorResponse.from_error(AuthError.INACTIVE_ACCOUNT, HTTPStatus.FORBIDDEN)
 
+    # セッションにEmailアドレスをセットする
+    session["email"] = user.email
+    
     # レスポンス生成
     return SuccessResponse.ok(
         SigninResponseSchema().dump({

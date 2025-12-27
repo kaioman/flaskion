@@ -79,5 +79,5 @@ class AuthService:
         db.commit()
         db.refresh(user)
         
-        # トークン返却
-        return token, None
+        # ユーザーModel, トークン返却
+        return user, token, None

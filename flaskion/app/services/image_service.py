@@ -3,6 +3,7 @@ from http import HTTPStatus
 from pydantic import ValidationError
 from pycorex.gemini_client import GeminiClient
 from ..models.image_gen_params import ImageGenParams
+from app.models.response.success import SuccessResponse
 
 def generate_image(param_data: dict):
     try:
@@ -21,8 +22,12 @@ def generate_image(param_data: dict):
         "static/generated/test005.png"
     ]
     # GeminiClient
-    return jsonify({"generated": results}), HTTPStatus.OK
-
+    #return jsonify({"generated": results}), HTTPStatus.OK
+    return SuccessResponse.ok(
+        {"generated": results},
+        HTTPStatus.OK
+    )
+    
 def get_all_models():
     return GeminiClient.GeminiModel
 

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, jsonify, request
 from typing import Any, Optional
 from pydantic import ValidationError
 from ..services import image_service as img_srv
+from app.core.security import get_user_from_session, mask_api_key
 
 # Blueprint定義
 root_bp = Blueprint('root', __name__)
@@ -25,6 +26,24 @@ def signin():
 @root_bp.get("/signup")
 def signup():
     return render_template("signup.html", hide_nav_items=True)
+
+@root_bp.get("/settings")
+def settings():
+    
+    # ログインユーザーを取得
+    user = get_user_from_session()
+
+    # uwgen APIキーをマスクする
+    if user.uwgen_api_key:
+        masked_uwgen_api_key = mask_api_key(user.uwgen_api_key)
+    else:
+        masked_uwgen_api_key = "[未発行]"
+    
+    return render_template(
+        "settings.html",
+        user=user,
+        masked_uwgen_api_key=masked_uwgen_api_key
+    )
 
 @root_bp.get("/image_gen")
 def image_gen():

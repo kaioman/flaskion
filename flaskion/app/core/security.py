@@ -1,10 +1,12 @@
 import bcrypt
 import jwt
 import secrets
-from flask import request
+from flask import request, session
+from http import HTTPStatus
 from jwt import ExpiredSignatureError, InvalidTokenError
 from datetime import datetime, timedelta, timezone
 from app.core.config import settings
+from app.core.errors import UserError
 from app.models.user import User
 from app.db.session import db
 
@@ -133,23 +135,56 @@ def get_current_user():
     auth_header = request.headers.get("Authorization")
     # ヘッダーの存在、ヘッダーに"Bearer "を含むか(Bearerは大文字小文字を許容)
     if not auth_header or not auth_header.lower().startswith("bearer "):
-        return None
+        return None, UserError.AUTH_HEADER_MISSING, HTTPStatus.UNAUTHORIZED
     
     # アクセストークン取得
     parts = auth_header.split()
     if len(parts) != 2:
-        return None
+        return None, UserError.AUTH_HEADER_MISSING, HTTPStatus.UNAUTHORIZED
     token = parts[1]
     try:
         payload = decode_access_token(token)
     except Exception as e:
         print(f"[decode_access_token] Invalid token: {e}")
-        return None
+        return None, UserError.INVALID_ACCESS_TOKEN, HTTPStatus.UNAUTHORIZED
     
-    # ユーザーID取得    
+    # ユーザーID取得
     user_id = payload.get("sub")
     if not user_id:
-        return None
+        return None, UserError.USER_NOT_FOUND, HTTPStatus.UNAUTHORIZED
     
     # ユーザー情報を返す
-    return db.query(User).filter_by(id=user_id).first()
+    return db.query(User).filter_by(id=user_id).first(), None, None
+
+def get_user_from_session():
+    """
+    セッションからユーザーIDを取得し、ユーザー情報を返す
+    
+    Returns
+    -------
+    User
+        ユーザー情報
+    """
+    
+    id = session.get("id")
+    if not id:
+        return None
+    return db.query(User).filter_by(id=id).first()
+    
+def mask_api_key(key: str | None) -> str:
+    """
+    指定されたAPIキーをマスクして返す
+    
+    Parameters
+    ----------
+    key : str
+        マスクするAPIキー
+    
+    Returns
+    -------
+    str
+        マスクされたAPIキー
+    """
+    if not key:
+        return ""
+    return key[:4] + "*" * (len(key) - 4)

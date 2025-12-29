@@ -35,7 +35,7 @@
                     <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" class="user-icon">
                     <span class="username">{{ current_user.email }}</span>
                     <div class="dropdown">
-                        <a href="#">設定</a>
+                        <a href="{{ url_for('root.settings') }}">設定</a>
                         <a href="#">ログアウト</a>
                     </div>
                 </div>

@@ -59,6 +59,15 @@ class UserError(Enum):
     ユーザー情報登録処理で発生するエラーコード一覧
     """
     
+    AUTH_HEADER_MISSING = "auht_header_missing"
+    """ Authorizationヘッダーが存在しない/不正 """
+    
+    INVALID_ACCESS_TOKEN = "invalid_access_token"
+    """ アクセストークンが不正 """
+
+    USER_UNAUTHORIZED = "user_unauthorized"
+    """ 認証されていないユーザー """
+    
     USER_NOT_FOUND = "user_not_found"
     """ ユーザーが見つからない """
     

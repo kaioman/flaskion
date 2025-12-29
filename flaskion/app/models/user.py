@@ -61,23 +61,27 @@ class User(BaseModel):
     )
     
     # 暗号化されたGemini APIキー(任意)
-    api_key_encrypted = Column(
-        String
+    gemini_api_key_encrypted = Column(
+        String,
+        info={"updatable": True}
     )
     
     # APIキーの最終更新日時
-    api_key_updated_at = Column(
-        TIMESTAMP(timezone=True)
+    gemini_api_key_updated_at = Column(
+        TIMESTAMP(timezone=True),
+        info={"updatable": True}
     )
 
     # Uwgen APIキー (平文)
     uwgen_api_key = Column(
         String,
         unique=True,
-        nullable=True
+        nullable=True,
+        info={"updatable": True}
     )
 
     # Uwgen APIキーの最終更新日時
     uwgen_api_key_updated_at = Column(
-        TIMESTAMP(timezone=True)
+        TIMESTAMP(timezone=True),
+        info={"updatable": True}
     )

@@ -1,0 +1,103 @@
+/* 全体 */
+.settings-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    font-family: system-ui sans-serif;
+}
+
+/* タイトル */
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 32px;
+}
+
+/* カード風セクション */
+.setting-card {
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 28px;
+}
+
+/* セクションタイトル */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* フォームグループ */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* APIキー表示ボックス */
+.api-key-box {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f5f5f7;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    min-width: 260px;
+}
+.api-key-box.unissued {
+    background: #fff4e5;
+    color: #b85c00;
+    border: 1px dashed #e0a96d;
+    font-style: italic;
+}
+
+/* APIキー行 */
+.api-key-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 共通の高さ */
+.api-key-box,
+input[type="password"] {
+    height: 40px;
+    box-sizing: border-box;
+}
+
+/* 入力欄 */
+input[type="password"] {
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+/* 保存ボタン */
+.settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn.primary.small {
+    height: 40px;
+    padding: 10px 14px;
+    margin: 0px;
+    font-size: 0.85rem;
+    line-height: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn.primary.large {
+    padding: 10px 20px;
+    margin: 0px;
+    font-size: 1rem;
+}

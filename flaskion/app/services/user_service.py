@@ -8,7 +8,6 @@ from app.db.transaction import transactional
 class UserService:
     
     @staticmethod
-    @transactional
     def generate_uwgen_api_key(email: str):
         """
         Uwgen独自のAPIキーを生成し、ユーザーに紐づけて保存する
@@ -33,12 +32,57 @@ class UserService:
         # APIキー生成
         new_key = generate_api_key_value()
         
-        # 更新
-        user.uwgen_api_key = new_key
-        user.uwgen_api_key_updated_at = datetime.now(timezone.utc)
+        return new_key, None
+
+    @staticmethod
+    @transactional
+    def update_settings(user: User, updates: dict):
+        """
+        ユーザー情報の部分更新を行う
         
-        # DB反映
+        Parameters
+        ----------
+        user : User
+            ユーザー情報
+        updates : dict 
+            更新対象dict
+            
+        Returns
+        -------
+        str 
+            エラーコード(成功時はNone)
+            
+        Notes
+        -----
+        - updates: {"uwgen_api_key": "...", "gemini_api_key": "..."}
+        """
+        
+        # ユーザー情報チェック
+        if not user:
+            return UserError.USER_NOT_FOUND
+        
+        # モデルから更新可能フィールド取得
+        updatable_fields = {
+            col.key
+            for col in User.__table__.columns
+            if col.info.get("updatable")
+        }
+        
+        # updatesのキーと照合して更新
+        for key, value in updates.items():
+            if key in updatable_fields and value is not None:
+                setattr(user, key, value)
+        
+        # Uwgen APIキーに変更があれば変更日時を更新する
+        if updates.get("uwgen_api_key_changed"):
+            user.uwgen_api_key_updated_at = datetime.now(timezone.utc)
+
+        # Gemini APIキーに変更があれば変更日時を更新する
+        if updates.get("gemini_api_key_changed"):
+            user.gemini_api_key_updated_at = datetime.now(timezone.utc)
+        
+        # DBに反映
         db.commit()
         db.refresh(user)
         
-        return new_key, None
+        return None

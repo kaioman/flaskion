@@ -14,6 +14,9 @@ REQUEST_ERROR_MESSAGE = {
 """ リクエスト系エラーメッセージ """
 
 USER_ERROR_MESSAGE = {
+    UserError.AUTH_HEADER_MISSING: "Authorizationヘッダーが存在しない、または不正です",
+    UserError.INVALID_ACCESS_TOKEN: "アクセストークンが不正です",
+    UserError.USER_UNAUTHORIZED: "ユーザーが認証されていません",
     UserError.USER_NOT_FOUND: "ユーザーが見つかりません",
     UserError.INVALID_API_KEY: "APIキーが無効です",
 }

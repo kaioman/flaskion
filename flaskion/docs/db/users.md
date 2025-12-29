@@ -15,17 +15,19 @@ This table is designed with the following goals:
 
 ## Table Definition
 
-| Column Name        | Type        | Not Null | Unique | Default                | Description                          |
-|--------------------|-------------|----------|--------|------------------------|--------------------------------------|
-| id                 | UUID        | YES      | YES    | `gen_random_uuid()`    | Primary key for the user             |
-| email              | TEXT        | YES      | YES    |                        | Login identifier for the user        |
-| password_hash      | TEXT        | YES      | NO     |                        | Hashed password (bcrypt/argon2)      |
-| is_active          | BOOLEAN     | YES      | NO     | `TRUE`                 | Whether the account is active        |
-| created_at         | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Account creation timestamp           |
-| updated_at         | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Last update timestamp                |
-| last_login_at      | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the most recent login   |
-| api_key_encrypted  | TEXT        | NO       | NO     |                        | Encrypted Gemini API key (optional)  |
-| api_key_updated_at | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last API key update |
+| Column Name               | Type        | Not Null | Unique | Default                | Description                                 |
+|---------------------------|-------------|----------|--------|------------------------|---------------------------------------------|
+| id                        | UUID        | YES      | YES    | `gen_random_uuid()`    | Primary key for the user                    |
+| email                     | TEXT        | YES      | YES    |                        | Login identifier for the user               |
+| password_hash             | TEXT        | YES      | NO     |                        | Hashed password (bcrypt/argon2)             |
+| is_active                 | BOOLEAN     | YES      | NO     | `TRUE`                 | Whether the account is active               |
+| created_at                | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Account creation timestamp                  |
+| updated_at                | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Last update timestamp                       |
+| last_login_at             | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the most recent login          |
+| uwgen_api_key             | TEXT        | NO       | NO     |                        | Uwgen API key (plaintext)                   |
+| uwgen_api_key_updated_at  | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Uwgen API key update  |
+| gemini_api_key_encrypted  | TEXT        | NO       | NO     |                        | Encrypted Gemini API key (optional)         |
+| gemini_api_key_updated_at | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Gemini API key update |
 
 ## Indexes
 
@@ -40,6 +42,66 @@ This table is designed with the following goals:
 - `api_key_encrypted` must be encrypted using AES-256 or equivalent.
 - Decryption keys must be stored in environment variables, not in the database.
 - API keys must never appear in logs, error messages, or plaintext storage.
+
+---
+
+## Updatable Field Metadata
+
+To ensure both safety and extensiblity in user-settings updates, Uwgen uses SQLAlchemy's
+`Column.info` metadata to explicitly mark which fields are allowed to be updated through the
+settings API.
+
+### Purpose
+
+The `PATCH /api/v1/settings` endpoint accepts partial updates from the client.
+Allowing arbitrary JSON keys to directly modify model attributes introduces two major risks:
+
+1. **Security risk** ー Sensitive fields such as `email`, `password_hash`, `role`, or `id` could be overwritten if not explicitly protected.
+2. **Maintenance risk** ー Hard-coding a list of updatable fields in service logic can lead to silent failures when new fields are added but not registered.
+
+To avoid both problems, the model itself declares which fields are safe to update.
+
+### How It Works
+
+Each updatable column includes a metadata flag:
+
+```Python
+api_key_encrypted = Column(
+    Text,
+    info={"updatable": True}
+)
+```
+
+The service layer then derives the list of updatable fields directly from the model:
+
+```Python
+updatable_fields = {
+    col.key
+    for col in User.__table__.columns
+    if col.info.get("updatable")
+}
+```
+
+During a settings update, only fields in this whitelist are applied.
+
+```Python
+for key, value in updates.items():
+    if key in updatable_fields and value is not None:
+        setattr(user, key, value)
+```
+
+### Benefits
+
+- **Security**
+  Prevents accidental or malicious modification of protected fields such as `id`, `email`, or `password_hash`.
+- **Extensibility**
+  Adding a new user-configurable field requires only updating the model definition.
+  No changes are needed in the service or routing layers.
+- **Single Source of Truth**
+  The model defines which fields are safe to update, keeping the contract clear and centralized.
+- **No Database Migration Required**
+  `Column.info` is ORM-level metadata and does not affect the database schema.
+  Adding or modifying `info` values does not require Alembic migrations.
 
 ---
 

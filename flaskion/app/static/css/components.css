@@ -30,25 +30,40 @@ input[type="text"]:focus {
 }
 
 /* ボタン */
-button {
+.btn {
     margin-left: 1rem;
     padding: 0.6rem 1.2rem;
     border: none;
-    border-radius: 12px;
+    border-radius: 6px;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    background: linear-gradient(135deg, #3a3f5c, #5a5f7c); /* 落ち着いたブルーグレー系 */
+    background-color: #5a5f7c;
     color: #f0f0f0;
     transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+    text-decoration: none;
 }
-button:hover {
+.btn:hover {
     transform: translateY(-2px);
-    background: linear-gradient(135deg, #4a4f6c, #6a6f8c); /* 少し明るく */
+    background-color: #6a6f8c;
     box-shadow: 0 0 12px rgba(0, 255, 224, 0.4); /* 控えめなネオンブルー */
 }
-button:active {
+.btn:active {
     transform: scale(0.95);
+}
+
+.btn.blue {
+    background-color: #4888ff;
+}
+.btn.blue:hover {
+    background-color: #2f6fe0;
+}
+
+.btn.purple {
+    background-color: #ae6fe9;
+}
+.btn.purple:hover {
+    background-color: #944fd4;
 }
 
 /* メッセージボックス(共通スタイル) */

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+<!-- ページタイトル -->
+{% block title %}Settings - Uwgen{% endblock %}
+
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+<script type="module" defer src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<div class="settings-container">
+    
+    <!-- タイトル -->
+    <h1 class="page-title">設定</h1>
+
+    <form id="settings-form">
+
+        <!-- Uwgen API Key -->
+        <section class="setting-card">
+            <h2 class="section-title">Uwgen APIキー</h2>
+
+            <div class="form-group">
+                <label>Uwgen APIキー(現在)</label>
+                <div class="api-key-row">
+                    <div id="uwgen-api-key-display"
+                        class="api-key-box {% if not user.uwgen_api_key %}unissued{% endif %}">
+                        {{ masked_uwgen_api_key }}
+                    </div>
+                    <input type="hidden" id="uwgen-api-key" value="{{ user.uwgen_api_key }}">
+                    <input type="hidden" id="original-uwgen-api-key" value="{{ user.uwgen_api_key }}">
+                    <button type="button" id="regenerate-api-key-btn" class="btn primary small">
+                        {% if user.uwgen_api_key %}再発行{% else %}発行{% endif %}
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gemini API Key -->
+        <section class="setting-card">
+            <h2 class="section-title">Gemini APIキー</h2>
+
+            <div class="form-group">
+                <label for="gemini-api-key">Gemini APIキー</label>
+                <input type="password" id="gemini-api-key" placeholder="Gemini APIキーを入力">
+                <input type="hidden" id="original-gemini-api-key" value="{{ user.gemini_api_key }}">
+            </div>
+        </section>
+
+        <!-- フッター保存ボタン -->
+        <div class="settings-footer">
+            <button type="button" id="save-settings-btn" class="btn primary large">保存</button>
+        </div>
+
+        <!-- オーバーレイ + スピナー -->
+        <div id="overlay" class="overlay" style="display:none;">
+            <div class="spinner"></div>
+        </div>
+
+    </form>
+
+    <!-- メッセージ表示欄 -->
+    <div class="message-area"></div>
+
+</div>
+{% endblock %}

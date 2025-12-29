@@ -104,9 +104,9 @@ function setupImageGenerateion() {
             msgMgr.clear();
 
             // Httpリクエストコード判定
-            if (response.isOk()) {
+            if (response.isSuccess()) {
 
-                response.body.generated.forEach(path => {
+                response.body.data.generated.forEach(path => {
                     
                     // カードテンプレート複製
                     const card = template.content.cloneNode(true);

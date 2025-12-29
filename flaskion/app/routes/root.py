@@ -39,10 +39,17 @@ def settings():
     else:
         masked_uwgen_api_key = "[未発行]"
     
+    # gemini APIキーをマスクする
+    if user.gemini_api_key_encrypted:
+        masked_gemini_api_key = mask_api_key(user.gemini_api_key_encrypted)
+    else:
+        masked_gemini_api_key = '[未設定]'
+    
     return render_template(
         "settings.html",
         user=user,
-        masked_uwgen_api_key=masked_uwgen_api_key
+        masked_uwgen_api_key=masked_uwgen_api_key,
+        masked_gemini_api_key=masked_gemini_api_key
     )
 
 @root_bp.get("/image_gen")

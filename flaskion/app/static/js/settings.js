@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
  */
 function setupRegenerate() {
     const regenerateApiKeyBtn = document.getElementById("regenerate-api-key-btn");
+    const warning = document.getElementById("uwgen-api-key-warning");
     const messageArea = document.querySelector(".message-area");
     const msgMgr = new MessageManager(messageArea);
 
@@ -47,11 +48,16 @@ function setupRegenerate() {
             // レスポンス判定
             if (response.isSuccess()) {
 
+                // 発行したAPIキーを取得
+                const uwgn_gen_api_key = response.body.data;
+
                 // 発行したAPIキーを画面に表示
-                document.getElementById("uwgen-api-key-display").value = response.body.data;
-                document.getElementById("uwgen-api-key").value = response.body.data;
-                
-                // ボタン周辺に保存ボタンの押下を促すポップアップメッセージ的なものを出したい
+                document.getElementById("uwgen-api-key-display").textContent = uwgn_gen_api_key;
+                document.getElementById("uwgen-api-key").value = uwgn_gen_api_key;
+
+                // API発行注意メッセージを表示
+                warning.textContent = "APIを発行しました。保存ボタンを押して確定してください";
+                warning.style.display = "block";
 
             } else {
                 // エラーメッセージ表示
@@ -82,27 +88,30 @@ function setupRegenerate() {
  * 保存処理
  */
 function setupSaveSettings() {
-    const regenerateApiKeyBtn = document.getElementById("regenerate-api-key-btn");
+    const saveSettingsBtn = document.getElementById("save-settings-btn");
     const uwgenHidden = document.getElementById("uwgen-api-key");
     const uwgenOrigin = document.getElementById("original-uwgen-api-key");
     const geminiInput = document.getElementById("gemini-api-key");
-    const geminiOrigin = document.getElementById("original-gemini-api-key");
+    const warning = document.getElementById("uwgen-api-key-warning");
     const messageArea = document.querySelector(".message-area");
     const msgMgr = new MessageManager(messageArea);
 
-    regenerateApiKeyBtn.addEventListener("click", async () => {
+    saveSettingsBtn.addEventListener("click", async () => {
 
         // 処理中スピナー表示・押下ボタン非活性
         overlay.style.display = "flex";
-        regenerateApiKeyBtn.disabled = true;
+        saveSettingsBtn.disabled = true;
 
+        // 注意メッセージを消す
+        warning.style.display = "none";
+        
         try {
             // payload
             const payload = {
                 uwgen_api_key: uwgenHidden.value || null,
                 uwgen_api_key_changed: uwgenHidden.value !== uwgenOrigin.value,
-                gemini_api_key: geminiInput.value || null,
-                gemini_api_key_changed: geminiInput.value !== geminiOrigin.value,
+                gemini_api_key_encrypted: geminiInput.value || null,
+                gemini_api_key_changed: geminiInput.value.trim() !== "",
             }
 
             // 追加ヘッダー
@@ -119,12 +128,13 @@ function setupSaveSettings() {
             // レスポンス判定
             if (response.isSuccess()) {
 
-                // 発行したAPIキーを画面に表示
-                document.getElementById("uwgen-api-key-display").textContent = response.body.data;
-                document.getElementById("uwgen-api-key").value = response.body.data;
-                document.getElementById("original-uwgen-api-key").value = response.body.data;
-                
-                // ボタン周辺に保存ボタンの押下を促すポップアップメッセージ的なものを出したい
+                // 成功メッセージ表示
+                msgMgr.show("設定の保存に成功しました", MessageType.SUCCESS, "成功");
+
+                // ルートページに遷移する
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 800);
 
             } else {
                 // エラーメッセージ表示
@@ -146,7 +156,7 @@ function setupSaveSettings() {
         } finally {
             // 処理中スピナー非表示・押下ボタン活性
             overlay.style.display = "none";
-            regenerateApiKeyBtn.disabled = false;
+            saveSettingsBtn.disabled = false;
         }
     });
 }

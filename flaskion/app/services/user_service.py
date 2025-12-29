@@ -4,19 +4,20 @@ from app.db.session import db
 from app.core.security import generate_api_key_value
 from app.core.errors import UserError
 from app.db.transaction import transactional
+from app.services.encrypt_service import EncryptService
 
 class UserService:
     
     @staticmethod
-    def generate_uwgen_api_key(email: str):
+    def generate_uwgen_api_key(id: str):
         """
         Uwgen独自のAPIキーを生成し、ユーザーに紐づけて保存する
         emailはunique前提
         
         Parameters
         ----------
-        email : str
-            Emailアドレス
+        id : str
+            ユーザーID
             
         Returns
         -------
@@ -25,7 +26,7 @@ class UserService:
         """
 
         # ユーザー情報取得
-        user = db.query(User).filter_by(email=email).first()
+        user = db.query(User).filter_by(id=id).first()
         if not user:
             return None, UserError.USER_NOT_FOUND
         
@@ -71,6 +72,11 @@ class UserService:
         # updatesのキーと照合して更新
         for key, value in updates.items():
             if key in updatable_fields and value is not None:
+                column = User.__table__.columns.get(key)
+                if column.info.get("encrypt"):
+                    key_type = column.info.get("key")
+                    value = EncryptService.encrypt(value, key_type)
+                
                 setattr(user, key, value)
         
         # Uwgen APIキーに変更があれば変更日時を更新する

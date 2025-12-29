@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Boolean, TIMESTAMP, text
 from sqlalchemy.dialects.postgresql import UUID
 from pydbx_hng.models.base.base_model import BaseModel
+from app.core.enums import EncryptionKeyType
 
 class User(BaseModel):
     """
@@ -60,10 +61,10 @@ class User(BaseModel):
         TIMESTAMP(timezone=True)
     )
     
-    # 暗号化されたGemini APIキー(任意)
+    # 暗号化されたGemini APIキー(任意。暗号化して保存)
     gemini_api_key_encrypted = Column(
         String,
-        info={"updatable": True}
+        info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.GEMINI}
     )
     
     # APIキーの最終更新日時
@@ -72,12 +73,12 @@ class User(BaseModel):
         info={"updatable": True}
     )
 
-    # Uwgen APIキー (平文)
+    # Uwgen APIキー (暗号化)
     uwgen_api_key = Column(
         String,
         unique=True,
         nullable=True,
-        info={"updatable": True}
+        info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.UWGEN}
     )
 
     # Uwgen APIキーの最終更新日時

@@ -187,4 +187,4 @@ def mask_api_key(key: str | None) -> str:
     """
     if not key:
         return ""
-    return key[:4] + "*" * (len(key) - 4)
+    return "*" * 40 + key[-4:]

@@ -46,7 +46,7 @@
     font-family: monospace;
     font-size: 0.95rem;
     letter-spacing: 0.5px;
-    min-width: 260px;
+    width: 400px;
 }
 .api-key-box.unissued {
     background: #fff4e5;
@@ -62,19 +62,17 @@
     gap: 12px;
 }
 
-/* 共通の高さ */
+/* 入力欄 */
 .api-key-box,
-input[type="password"] {
+input[type="password"].api-key-input {
     height: 40px;
     box-sizing: border-box;
-}
-
-/* 入力欄 */
-input[type="password"] {
     padding: 0 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
+    width: 100%;
+    max-width: 400px;
 }
 
 /* 保存ボタン */
@@ -84,20 +82,12 @@ input[type="password"] {
     margin-top: 24px;
 }
 
-.btn.primary.small {
-    height: 40px;
-    padding: 10px 14px;
-    margin: 0px;
-    font-size: 0.85rem;
-    line-height: 1;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn.primary.large {
-    padding: 10px 20px;
-    margin: 0px;
-    font-size: 1rem;
+.warning-message {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fff8e5;
+    border-left: 4px solid #e0a96d;
+    color: #8a5a00;
+    font-size: 0.9rem;
+    border-radius: 4px;
 }

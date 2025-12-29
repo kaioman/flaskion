@@ -14,3 +14,7 @@ def register_routes(app:Flask):
     # authルート
     from app.api.v1.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
+
+    # settingsルート
+    from app.api.v1.settings import bp as settings_bp
+    app.register_blueprint(settings_bp)

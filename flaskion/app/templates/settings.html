@@ -23,7 +23,6 @@
             <h2 class="section-title">Uwgen APIキー</h2>
 
             <div class="form-group">
-                <label>Uwgen APIキー(現在)</label>
                 <div class="api-key-row">
                     <div id="uwgen-api-key-display"
                         class="api-key-box {% if not user.uwgen_api_key %}unissued{% endif %}">
@@ -31,10 +30,12 @@
                     </div>
                     <input type="hidden" id="uwgen-api-key" value="{{ user.uwgen_api_key }}">
                     <input type="hidden" id="original-uwgen-api-key" value="{{ user.uwgen_api_key }}">
-                    <button type="button" id="regenerate-api-key-btn" class="btn primary small">
+                    <button type="button" id="regenerate-api-key-btn" class="btn small">
                         {% if user.uwgen_api_key %}再発行{% else %}発行{% endif %}
                     </button>
                 </div>
+                <!-- 保存ボタン押下注意メッセージ表示領域 -->
+                <div id="uwgen-api-key-warning" class="warning-message" style="display:none;"></div>
             </div>
         </section>
 
@@ -43,15 +44,24 @@
             <h2 class="section-title">Gemini APIキー</h2>
 
             <div class="form-group">
-                <label for="gemini-api-key">Gemini APIキー</label>
-                <input type="password" id="gemini-api-key" placeholder="Gemini APIキーを入力">
-                <input type="hidden" id="original-gemini-api-key" value="{{ user.gemini_api_key }}">
+                <label>現在の値</label>
+                <div class="api-key-row">
+                    <div id="gemini-api-key-display"
+                        class="api-key-box {% if not user.gemini_api_key_encrypted %}unissued{% endif %}">
+                        {{ masked_gemini_api_key }}
+                    </div>
+                </div>
+                <label for="gemini-api-key">変更後の値</label>
+                <div class="api-key-row">
+                    <input type="password" id="gemini-api-key" class="api-key-input" placeholder="Gemini APIキーを入力">
+                    <input type="hidden" id="original-gemini-api-key" value="{{ user.gemini_api_key_encrypted }}">
+                </div>
             </div>
         </section>
 
         <!-- フッター保存ボタン -->
         <div class="settings-footer">
-            <button type="button" id="save-settings-btn" class="btn primary large">保存</button>
+            <button type="button" id="save-settings-btn" class="btn blue">保存</button>
         </div>
 
         <!-- オーバーレイ + スピナー -->

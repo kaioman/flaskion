@@ -66,6 +66,18 @@ input[type="text"]:focus {
     background-color: #944fd4;
 }
 
+.btn.small {
+    height: 40px;
+    padding: 10px 14px;
+    margin: 0px;
+    font-size: 0.85rem;
+    line-height: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* メッセージボックス(共通スタイル) */
 .message-box {
     padding: 12px 16px;

@@ -11,6 +11,8 @@ services:
       - PYDEVD_DISABLE_FILE_VALIDATION=1 # frozen modulesチェックスキップ(再起動時の警告抑止)
       - SECRET_KEY=dev-secret-key-20251227 # Flask session secret-key
       - JWT_SECRET_KEY=change_this_secret-20251227 # JWT secret-key
+      - GEMINI_KEY_SECRET=DyWGcTIoPVaj6z0XOESepWecyGj20hY6l31q1dBXWxk=
+      - UWGEN_KEY_SECRET=fQxVZxoMMSVhMB7yY6CpxNmtqYq--xetC2ksxedfQ20=
     entrypoint: [
       "/var/docker-flask/flaskion/env/bin/python", 
       "-Xfrozen_modules=off", 

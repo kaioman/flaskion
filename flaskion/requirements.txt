@@ -12,3 +12,4 @@ marshmallow
 dotenv
 bcrypt
 pyjwt
+cryptopraphy

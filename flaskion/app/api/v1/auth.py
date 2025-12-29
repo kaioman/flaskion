@@ -54,7 +54,7 @@ def signin():
     if err == AuthError.INACTIVE_ACCOUNT:
         return ErrorResponse.from_error(AuthError.INACTIVE_ACCOUNT, HTTPStatus.FORBIDDEN)
 
-    # セッションにEmailアドレスをセットする
+    # セッションにidとEmailアドレスをセットする
     session["id"] = user.id
     session["email"] = user.email
     

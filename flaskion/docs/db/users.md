@@ -90,7 +90,7 @@ for key, value in updates.items():
         setattr(user, key, value)
 ```
 
-### Benefits
+### Benefits of Updatable
 
 - **Security**
   Prevents accidental or malicious modification of protected fields such as `id`, `email`, or `password_hash`.
@@ -103,6 +103,49 @@ for key, value in updates.items():
   `Column.info` is ORM-level metadata and does not affect the database schema.
   Adding or modifying `info` values does not require Alembic migrations.
 
+---
+
+## Encryption Metadata (`encrypt` and `key`)
+
+Some user fields contain sensitive API keys that must be encrypted before being stored in the database.
+To support this securely and declaratively, the `users` model uses two additional `Column.info` metadata flags:
+
+### `encrypt: True`
+
+When present, this flag indicates that the field must be encrypted before being persisted.
+The service layer checks this metadata during settings updates:
+
+- If `encrypt=True`, the incoming plaintext value is encrypted using the appropriate Fernet cipher.
+- If `encrypt` is not set, the value is stored as-is.
+
+This ensures that encryption behavior is defined at the model level rather than scattered across service logic.
+
+### `key: EncryptionKeyType`
+
+Encrypted fields must specify which Fernet encryption key should be used.
+Uwgen supports multiple Fernet keys (e.g., one for Uwgen API keys, one for Gemini API keys).
+The `key` metadata associates a field with the correct key:
+
+```Python
+info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.UWGEN}
+```
+
+During updates, the service layer reads this metadata and selects the appropriate cipher instance.
+
+### Benefits of Encryption
+
+- **Security**
+  Ensures that sensitive fields are always encrypted with the correct key, with no risk of
+  accidental plaintext storage.
+- **Explicit Contracts**
+  The model clearly declares which fields require encryption and which key they use.
+- **Extensibility**
+  Adding a new encrypted field requires only updating the model definition;
+  no changes are needed in the service layer.
+- **Environment Isolation**
+  Each key type maps to a different Fernet key, allowing development and production
+  environments to use separate encryption keys safely.
+  
 ---
 
 ## Lifecycle Events

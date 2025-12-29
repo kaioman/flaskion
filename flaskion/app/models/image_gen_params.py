@@ -1,5 +1,4 @@
 from libcore_hng.core.base_api_model import BaseApiModel
-#from pydantic import BaseModel
 from typing import Optional
 
 class ImageGenParams(BaseApiModel):

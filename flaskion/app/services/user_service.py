@@ -86,6 +86,10 @@ class UserService:
         # Gemini APIキーに変更があれば変更日時を更新する
         if updates.get("gemini_api_key_changed"):
             user.gemini_api_key_updated_at = datetime.now(timezone.utc)
+
+        # Gemini(VertexAI) APIキーに変更があれば変更日時を更新する
+        if updates.get("gemini_api_key_vertexai_changed"):
+            user.gemini_api_key_vertexai_updated_at = datetime.now(timezone.utc)
         
         # DBに反映
         db.commit()

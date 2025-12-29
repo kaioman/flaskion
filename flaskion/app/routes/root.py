@@ -44,12 +44,19 @@ def settings():
         masked_gemini_api_key = mask_api_key(user.gemini_api_key_encrypted)
     else:
         masked_gemini_api_key = '[未設定]'
-    
+
+    # gemini(VertexAI) APIキーをマスクする
+    if user.gemini_api_key_vertexai_encrypted:
+        masked_gemini_api_key_vertexai = mask_api_key(user.gemini_api_key_vertexai_encrypted)
+    else:
+        masked_gemini_api_key_vertexai = '[未設定]'
+
     return render_template(
         "settings.html",
         user=user,
         masked_uwgen_api_key=masked_uwgen_api_key,
-        masked_gemini_api_key=masked_gemini_api_key
+        masked_gemini_api_key=masked_gemini_api_key,
+        masked_gemini_api_key_vertexai=masked_gemini_api_key_vertexai
     )
 
 @root_bp.get("/image_gen")

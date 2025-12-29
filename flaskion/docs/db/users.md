@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `users` table stores account information for Ugen users.
+The `users` table stores account information for Uwgen users.
 It represents the core identity record for authentication, authorization, and user-specific configuration.
 
 This table is designed with the following goals:
@@ -15,19 +15,21 @@ This table is designed with the following goals:
 
 ## Table Definition
 
-| Column Name               | Type        | Not Null | Unique | Default                | Description                                 |
-|---------------------------|-------------|----------|--------|------------------------|---------------------------------------------|
-| id                        | UUID        | YES      | YES    | `gen_random_uuid()`    | Primary key for the user                    |
-| email                     | TEXT        | YES      | YES    |                        | Login identifier for the user               |
-| password_hash             | TEXT        | YES      | NO     |                        | Hashed password (bcrypt/argon2)             |
-| is_active                 | BOOLEAN     | YES      | NO     | `TRUE`                 | Whether the account is active               |
-| created_at                | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Account creation timestamp                  |
-| updated_at                | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Last update timestamp                       |
-| last_login_at             | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the most recent login          |
-| uwgen_api_key             | TEXT        | NO       | NO     |                        | Uwgen API key (plaintext)                   |
-| uwgen_api_key_updated_at  | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Uwgen API key update  |
-| gemini_api_key_encrypted  | TEXT        | NO       | NO     |                        | Encrypted Gemini API key (optional)         |
-| gemini_api_key_updated_at | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Gemini API key update |
+| Column Name                        | Type        | Not Null | Unique | Default                | Description                                           |
+|------------------------------------|-------------|----------|--------|------------------------|-------------------------------------------------------|
+| id                                 | UUID        | YES      | YES    | `gen_random_uuid()`    | Primary key for the user                              |
+| email                              | TEXT        | YES      | YES    |                        | Login identifier for the user                         |
+| password_hash                      | TEXT        | YES      | NO     |                        | Hashed password (bcrypt/argon2)                       |
+| is_active                          | BOOLEAN     | YES      | NO     | `TRUE`                 | Whether the account is active                         |
+| created_at                         | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Account creation timestamp                            |
+| updated_at                         | TIMESTAMPZ  | YES      | NO     | `NOW()`                | Last update timestamp                                 |
+| last_login_at                      | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the most recent login                    |
+| uwgen_api_key                      | TEXT        | NO       | NO     |                        | Uwgen API key (plaintext)                             |
+| uwgen_api_key_updated_at           | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Uwgen API key update            |
+| gemini_api_key_encrypted           | TEXT        | NO       | NO     |                        | Encrypted Gemini API key (optional)                   |
+| gemini_api_key_updated_at          | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Gemini API key update           |
+| gemini_api_key_vertexai_encrypted  | TEXT        | NO       | NO     |                        | Encrypted Gemini(VertexAI) API key (optional)         |
+| gemini_api_key_vertexai_updated_at | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Gemini(VertexAI) API key update |
 
 ## Indexes
 

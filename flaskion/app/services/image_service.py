@@ -21,8 +21,8 @@ def generate_image(param_data: dict):
         "static/generated/test004.png",
         "static/generated/test005.png"
     ]
-    # GeminiClient
-    #return jsonify({"generated": results}), HTTPStatus.OK
+
+    # 生成結果を返す
     return SuccessResponse.ok(
         {"generated": results},
         HTTPStatus.OK

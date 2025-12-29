@@ -92,6 +92,7 @@ function setupSaveSettings() {
     const uwgenHidden = document.getElementById("uwgen-api-key");
     const uwgenOrigin = document.getElementById("original-uwgen-api-key");
     const geminiInput = document.getElementById("gemini-api-key");
+    const geminiVertexAiInput = document.getElementById("gemini-api-key-vertexai");
     const warning = document.getElementById("uwgen-api-key-warning");
     const messageArea = document.querySelector(".message-area");
     const msgMgr = new MessageManager(messageArea);
@@ -112,6 +113,8 @@ function setupSaveSettings() {
                 uwgen_api_key_changed: uwgenHidden.value !== uwgenOrigin.value,
                 gemini_api_key_encrypted: geminiInput.value || null,
                 gemini_api_key_changed: geminiInput.value.trim() !== "",
+                gemini_api_key_vertexai_encrypted: geminiVertexAiInput.value || null,
+                gemini_api_key_vertexai_changed: geminiVertexAiInput.value.trim() !== "",
             }
 
             // 追加ヘッダー

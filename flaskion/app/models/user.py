@@ -67,8 +67,20 @@ class User(BaseModel):
         info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.GEMINI}
     )
     
-    # APIキーの最終更新日時
+    # Gemini APIキーの最終更新日時
     gemini_api_key_updated_at = Column(
+        TIMESTAMP(timezone=True),
+        info={"updatable": True}
+    )
+
+    # 暗号化されたGemini(VertexAI) APIキー(任意。暗号化して保存)
+    gemini_api_key_vertexai_encrypted = Column(
+        String,
+        info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.GEMINI}
+    )
+    
+    # Gemini APIキー(VertexAI)の最終更新日時
+    gemini_api_key_vertexai_updated_at = Column(
         TIMESTAMP(timezone=True),
         info={"updatable": True}
     )
@@ -80,9 +92,10 @@ class User(BaseModel):
         nullable=True,
         info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.UWGEN}
     )
-
+    
     # Uwgen APIキーの最終更新日時
     uwgen_api_key_updated_at = Column(
         TIMESTAMP(timezone=True),
         info={"updatable": True}
     )
+    

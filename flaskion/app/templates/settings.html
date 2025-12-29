@@ -57,6 +57,23 @@
                     <input type="hidden" id="original-gemini-api-key" value="{{ user.gemini_api_key_encrypted }}">
                 </div>
             </div>
+
+            <h2 class="section-title">Gemini(VertexAI) APIキー</h2>
+
+            <div class="form-group">
+                <label>現在の値</label>
+                <div class="api-key-row">
+                    <div id="gemini-api-key-vertexai-display"
+                        class="api-key-box {% if not user.gemini_api_key_vertexai_encrypted %}unissued{% endif %}">
+                        {{ masked_gemini_api_key_vertexai }}
+                    </div>
+                </div>
+                <label for="gemini-api-key-vertexai">変更後の値</label>
+                <div class="api-key-row">
+                    <input type="password" id="gemini-api-key-vertexai" class="api-key-input" placeholder="Gemini(VertexAI) APIキーを入力">
+                    <input type="hidden" id="original-gemini-api-key-vertexai" value="{{ user.gemini_api_key_vertexai_encrypted }}">
+                </div>
+            </div>
         </section>
 
         <!-- フッター保存ボタン -->

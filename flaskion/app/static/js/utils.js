@@ -7,21 +7,39 @@ import { ResponseModel } from "./models.js";
 export class HttpClient {
 
     /**
+     * 共通ヘッダー定義
+     */
+    static defaultHeaders() {
+        const token = localStorage.getItem("access_token");
+        return token ? { "Authorization": `Bearer ${token}` } : {};
+    }
+
+    /**
      * POSTリクエストを送信する
-     * @param {*} url  - リクエスト先のURL
-     * @param {*} payload  - 送信するデータ(JSON形式)
-     * @param {*} headers  - 追加ヘッダー(任意)
+     * @param {string} url  - リクエスト先のURL
+     * @param {object} payload  - 送信するデータ(JSON形式)
+     * @param {boolean} [options.auth=true] - 認証ヘッダーを付与するかどうか
+     * @param {object} [options.headers={}] - 追加ヘッダー(任意)
      * @returns {Promise<ResponseModel>} - サーバーから返却されたJSONレスポンス
      */
-    static async post(url, payload, headers = {}) {
+    static async post(url, payload, { auth = true, headers = {} } = {}) {
         try {
+            // ヘッダー作成
+            const finalHeaders = auth
+                ? {
+                    "Content-Type":  "application/json",
+                    ...HttpClient.defaultHeaders(), 
+                    ...headers 
+                }
+                : {
+                    "Content-Type":  "application/json",
+                    ...headers
+                };
+
             // fetch APIでPOSTリスエストを送信
             const response = await fetch(url, {
                 method : "POST",
-                headers: { 
-                    "Content-Type":  "application/json",
-                    ...headers
-                },
+                headers: finalHeaders,
                 body: JSON.stringify(payload)
             });
             
@@ -43,13 +61,26 @@ export class HttpClient {
 
     /**
      * GETリクエストを送信する
-     * @param {*} url - リクエスト先のURL
+     * @param {string} url - リクエスト先のURL
+     * @param {boolean} [options.auth=true] - 認証ヘッダーを付与するかどうか
+     * @param {object} [options.headers={}] - 追加ヘッダー(任意)
      * @returns {Promise<object>} - サーバーから返却されたJSONレスポンス
      */
-    static async get(url) {
+    static async get(url, { auth = true, headers = {} } = {}) {
         try {
+            // ヘッダー作成
+            const finalHeaders = auth
+                ? {
+                    ...HttpClient.defaultHeaders(), 
+                    ...headers 
+                }
+                : headers;
+
             // fetch APIでGETリクエストを送信
-            const response = await fetch(url, { method: "GET" });
+            const response = await fetch(url, { 
+                method: "GET",
+                headers: finalHeaders
+            });
             
             // レスポンスチェック
             const body = await response.json();
@@ -64,20 +95,30 @@ export class HttpClient {
 
     /**
      * PATCHリクエストを送信する
-     * @param {*} url  - リクエスト先のURL
-     * @param {*} payload  - 送信するデータ(JSON形式)
-     * @param {*} headers  - 追加ヘッダー(任意)
+     * @param {string} url  - リクエスト先のURL
+     * @param {object} payload  - 送信するデータ(JSON形式)
+     * @param {boolean} [options.auth=true] - 認証ヘッダーを付与するかどうか
+     * @param {object} [options.headers={}] - 追加ヘッダー(任意)
      * @returns {Promise<ResponseModel>} - サーバーから返却されたJSONレスポンス
      */
-    static async patch(url, payload, headers = {}) {
+    static async patch(url, payload, { auth = true, headers = {} } = {}) {
         try {
+            // ヘッダー作成
+            const finalHeaders = auth
+                ? {
+                    "Content-Type":  "application/json",
+                    ...HttpClient.defaultHeaders(), 
+                    ...headers 
+                }
+                : {
+                    "Content-Type":  "application/json",
+                    ...headers
+                };
+
             // fetch APIでPATCHリスエストを送信
             const response = await fetch(url, {
                 method : "PATCH",
-                headers: { 
-                    "Content-Type":  "application/json",
-                    ...headers
-                },
+                headers: finalHeaders,
                 body: JSON.stringify(payload)
             });
             
@@ -91,6 +132,38 @@ export class HttpClient {
                 headers: response.headers,
             });
 
+        } catch (error) {
+            // 通信エラーやサーバーエラーを呼び出し元に伝える
+            throw error;
+        }
+    }
+
+    /**
+     * Blob URLを取得する
+     * @param {string} url - リクエスト先のURL
+     * @param {boolean} [options.auth=true] - 認証ヘッダーを付与するかどうか
+     * @param {object} [options.headers={}] - 追加ヘッダー(任意)
+     * @returns {Promise<string>} - Blob URL
+     */
+    static async getBlobUrl(url, { auth = true, headers = {} } = {}) {
+        try {
+            // ヘッダー作成
+            const finalHeaders = auth
+                ? {
+                    ...HttpClient.defaultHeaders(), 
+                    ...headers 
+                }
+                : headers;
+
+            // Blob URLの生成
+            const response = await fetch(url, {
+                method: "GET",
+                headers: finalHeaders
+            });
+            const blob = await response.blob();
+
+            // Blob URLを返す
+            return URL.createObjectURL(blob);
         } catch (error) {
             // 通信エラーやサーバーエラーを呼び出し元に伝える
             throw error;

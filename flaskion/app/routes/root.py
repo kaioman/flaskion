@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, jsonify, request
 from typing import Any, Optional
-from pydantic import ValidationError
-from ..services import image_service as img_srv
+from pycorex.gemini_client import GeminiClient
+from app.services.image_service import ImageGenService
 from app.core.security import get_user_from_session, mask_api_key
 
 # Blueprint定義
@@ -75,18 +75,13 @@ def image_gen():
     """
     
     # 各種列挙体を取得
-    gemini_models = img_srv.get_image_models()
-    image_sizes = img_srv.get_resolutions()
-    image_aspects = img_srv.get_aspects()
-    image_safety_filters = img_srv.get_safety_filters()
-    image_safety_levels = img_srv.get_safety_levels()
+    gemini_models = ImageGenService.get_image_models()
+    image_sizes = ImageGenService.get_resolutions()
+    image_aspects = ImageGenService.get_aspects()
+    image_safety_filters = ImageGenService.get_safety_filters()
+    image_safety_levels = ImageGenService.get_safety_levels()
     
     # 変数初期化
-    model: Optional[str] = None
-    resolution: Optional[str] = None
-    aspect: Optional[str] = None
-    safety_filter: Optional[str] = None
-    safety_level: Optional[str] = None
     generated_paths: Optional[list[str]] = None
     error: Optional[str] = None
     
@@ -98,31 +93,13 @@ def image_gen():
         aspects=image_aspects,
         safety_filters=image_safety_filters,
         safety_levels=image_safety_levels,
-        selected_model=model,
-        selected_resolution=resolution,
-        selected_aspect=aspect,
-        selected_safety_filter=safety_filter,
-        selected_safety_level=safety_level,
+        selected_model=GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW.value,
+        selected_resolution=GeminiClient.ImageSize.ONE_K.value,
+        selected_aspect=GeminiClient.AspectRatio.SQUARE.value,
+        selected_safety_filter=GeminiClient.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT.value,
+        selected_safety_level=GeminiClient.SafetyFilterLevel.BLOCK_ONLY_HIGH.value,
         error=error
     )
-
-@root_bp.route("/get_gen_image", methods=["POST"])
-def get_gen_image():
-    """
-    画像生成エンドポイント
-    """
-    if request.method == "POST":
-        
-        try:
-
-            # フォームの入力値をパラメーターモデルクラスに設定する
-            param_data: dict = request.get_json()
-            
-        except ValidationError as e:
-            return jsonify({"error": e.errors() }), img_srv.HTTPStatus.BAD_REQUEST
-        
-        # 生成結果(画像パス)をJSONで返す
-        return img_srv.generate_image(param_data)
 
 @root_bp.route("/test", methods=["GET", "POST"])
 def test():

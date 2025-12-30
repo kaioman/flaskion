@@ -59,7 +59,7 @@ class UserError(Enum):
     ユーザー情報登録処理で発生するエラーコード一覧
     """
     
-    AUTH_HEADER_MISSING = "auht_header_missing"
+    AUTH_HEADER_MISSING = "auth_header_missing"
     """ Authorizationヘッダーが存在しない/不正 """
     
     INVALID_ACCESS_TOKEN = "invalid_access_token"
@@ -73,4 +73,29 @@ class UserError(Enum):
     
     INVALID_API_KEY = "invalid_api_key"
     """ APIキーが無効 """
+
+class ImageGenError(Enum):
+    """
+    画像生成処理で発生するエラーコード一覧
+    """
     
+    MISSING_PROMPT = "missing_prompt"
+    """ プロンプトが指定されていない """
+    
+    INVALID_PARAMETER = "invalid_parameter"
+    """ パラメーター不正 """
+    
+    MISSING_GEMINI_API_KEY = "missing_gemini_api_key"
+    """ GeminiAPIキーが未設定 """
+    
+    FILE_NOT_FOUND = "file_not_found"
+    """ 画像ファイルが見つからない """
+    
+    PATH_TRAVERSAL_DETECTED = "path_traversal_detected"
+    """ パストラバーサル対策が検出された """
+    
+    IMAGE_NO_CANDIDATES = "image_no_candidates"
+    """ 画像を生成できませんでした。プロンプトを変えて再度実行してください """
+    
+    IMAGE_INTERNAL_ERROR = "image_internal_error"
+    """ 画像生成中に予期しないエラーが発生しました。時間をおいて再度実行してください """

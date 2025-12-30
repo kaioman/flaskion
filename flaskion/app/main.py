@@ -1,14 +1,15 @@
+import os
+import sys
+import time
 from flask import Flask, g, session
 from flask_socketio import SocketIO
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
-from .routes import register_routes
-from .core.config import settings
+from app.routes import register_routes
+from app.core.config import settings
+from app.core.logging import init_logging
 from app.models.user import User
 from app.db.session import db
-import os
-import sys
-import time
 
 # FlaskアプリケーションとSocketIOの初期化
 app = Flask(__name__)
@@ -16,6 +17,9 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
 
 # Flask Secret-Keyを設定
 app.config["SECRET_KEY"] = settings.SECRET_KEY
+
+# ロガーを初期化する
+init_logging()
 
 @app.before_request
 def load_user():

@@ -18,7 +18,7 @@ def renegerate_uwgen_api_key():
     current_user, error, status = get_current_user()
     if error:
         return ErrorResponse.from_error(error, status)
-        
+    
     # Uwge APIキー発行
     new_key, error = UserService.generate_uwgen_api_key(current_user.id)
     if error == UserError.USER_NOT_FOUND:

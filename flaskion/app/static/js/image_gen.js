@@ -50,16 +50,15 @@ function setupImageGenerateion() {
     const resultList = document.querySelector(".result-list");
     /** @type {HTMLTemplateElement} */
     const template = document.getElementById("result-card-template");
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    const closeModal = document.querySelector(".close-modal");
 
     // メッセージマネージャーインスタンス
     const msgMgr = new MessageManager(messageArea);
 
-    // 画像パス取得
-    const extractRelativePath = (path) =>
-        `/static/${path.split('static/')[1]}`;
-
     // 生成結果クリック時イベントハンドラ追加
-    resultList.addEventListener("click", (e) =>{
+    resultList.addEventListener("click", async (e) =>{
 
         // ボタン取得
         const btn = e.target.closest("button");
@@ -75,20 +74,35 @@ function setupImageGenerateion() {
 
         // ダウンロードボタンクリック時
         if (btn.classList.contains("download-btn")) {
+
+            // blob URL生成
+            const apiUrl = card.dataset.path;
+            const objcetUrl = await HttpClient.getBlobUrl(apiUrl);
+
+            // ダウンロードリンク設定
             const a = document.createElement("a");
-            a.href = relative;
-            a.download = "";
+            a.href = objcetUrl;
+            a.download = apiUrl.split("/").pop();
             a.click();
+
+            // メモリ開放
+            URL.revokeObjectURL(objcetUrl);
         }
 
-        // URLコピーボタンクリック時
-        if (btn.classList.contains("urlcopy-btn")) {
-            navigator.clipboard.writeText(`${location.origin}${relative}`);
+        // 画像拡大ボタンクリック時
+        if (btn.classList.contains("preview-btn")) {
+
+            // blob URL生成
+            const objcetUrl = await HttpClient.getBlobUrl(card.dataset.path);
+
+            // 画像拡大モーダル表示
+            modal.style.display = "block";
+            modalImg.src = objcetUrl;
         }
 
     });
 
-    // 生成ボタンクリック時イベントハンドラ追加
+    // 画像生成ボタンクリック時イベントハンドラ追加
     generateBtn.addEventListener("click", async function() {
         overlay.style.display = "flex";
         generateBtn.disabled = true;
@@ -98,7 +112,7 @@ function setupImageGenerateion() {
 
         try {
             // サーバーにPOSTリクエストを送信して結果を受け取る
-            const response = await HttpClient.post("/get_gen_image", payload);
+            const response = await HttpClient.post("/api/v1/image_gen", payload);
 
             // 結果リストをクリア
             msgMgr.clear();
@@ -106,21 +120,21 @@ function setupImageGenerateion() {
             // Httpリクエストコード判定
             if (response.isSuccess()) {
 
-                response.body.data.generated.forEach(path => {
+                response.body.data.generated.forEach(async (path) => {
                     
                     // カードテンプレート複製
                     const card = template.content.cloneNode(true);
                     
-                    // 画像パス取得
-                    const relative = extractRelativePath(path);
+                    // 画像パス取得(blob URL生成)
+                    const objcetUrl = await HttpClient.getBlobUrl(path);
 
                     // 画像設定
                     const img = card.querySelector(".result-img");
-                    img.src = relative;
+                    img.src = objcetUrl;
 
                     // カードにパスを保持
                     const root = card.querySelector(".result-card");
-                    root.dataset.path = relative;
+                    root.dataset.path = path;
 
                     // DOMに追加
                     resultList.appendChild(card);
@@ -131,10 +145,10 @@ function setupImageGenerateion() {
 
             } else if (response.isBadRequest()) {
                 // プロンプト未入力メッセージ表示
-                msgMgr.show(response.body.error, MessageType.WARNING, "入力エラー", response.status);
+                msgMgr.show(response.body.message, MessageType.WARNING, "入力エラー", response.status);
             } else {
                 // 内部エラーメッセージ表示
-                msgMgr.show(response.body.error, MessageType.ERROR, "サーバー側でエラーが発生しました", response.status);
+                msgMgr.show(response.body.message, MessageType.ERROR, "サーバー側でエラーが発生しました", response.status);
             }
         } catch (err) {
             msgMgr.show(err, MessageType.ERROR, "通信エラーが発生しました");
@@ -143,5 +157,9 @@ function setupImageGenerateion() {
             overlay.style.display = "none";
             generateBtn.disabled = false;
         }
-    })
+    });
+
+    // モーダルを閉じる
+    closeModal.onclick = () => modal.style.display = "none";
+    modal.onclick = () => modal.style.display = "none";
 }

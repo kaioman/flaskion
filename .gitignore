@@ -2,3 +2,5 @@ env
 pg12_data
 __pycache__
 docker-container/.env
+flaskion/media/generated/*
+flaskion/log/*

@@ -1,9 +1,13 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from dataclasses import dataclass
 
 # .envファイルの内容を環境変数にロードする
 load_dotenv()
+
+# プロジェクトルート
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 @dataclass
 class Settings:
@@ -27,5 +31,11 @@ class Settings:
     # デバッグモード
     DEBUG: bool = os.getenv("DEBUGPY", "false").lower() == "true"
 
+    # メディア保存先(画像等)
+    MEDIA_ROOT: Path = BASE_DIR / "media"
+    
+    # 生成画像ディレクトリ
+    GEN_IMAGE_DIR: str = "generated"
+    
 # インスタンス生成
 settings = Settings()

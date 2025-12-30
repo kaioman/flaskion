@@ -67,10 +67,17 @@
             <img class="result-img" alt="生成画像">
             <div class="result-meta">
                 <button class="btn download-btn">ダウンロード</button>
-                <button class="btn urlcopy-btn">URLをコピー</button>
+                <button class="btn preview-btn">画像を拡大</button>
             </div>
         </div>
     </template>
+
+    <!-- 画像拡大モーダル表示 -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
 </main>
 <!-- JS 読込 -->
 <script type="module" defer src="{{ url_for('static', filename='js/image_gen.js') }}"></script>

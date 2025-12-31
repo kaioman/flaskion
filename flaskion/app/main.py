@@ -8,6 +8,7 @@ from watchdog.observers.polling import PollingObserver
 from app.routes import register_routes
 from app.core.config import settings
 from app.core.logging import init_logging
+from app.core.version import APP_VERSION
 from app.models.user import User
 from app.db.session import db
 
@@ -34,7 +35,7 @@ def inject_user():
     """
     テンプレートに current_userを注入
     """
-    return dict(current_user=g.get("current_user"))
+    return dict(current_user=g.get("current_user"), app_version=APP_VERSION)
 
 @app.teardown_request
 def shutdown_session(exception=None):

@@ -119,31 +119,29 @@ body {
 }
 
 .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #f5f5f5;
-    color: #333;
-    text-align: center;
-    padding: 0.1rem;
+    color: #666;
+    padding: 10px 20px;
     font-size: 0.9rem;
     border-top: 1px solid #ccc;
+}
+
+.footer-left {
+    text-align: left;
+}
+
+.footer-right {
+    text-align: right;
+    opacity: 0.8;
 }
 
 .icon {
     font-size: 2rem;
     margin-bottom: 1rem;
 }
-
-/* .btn {
-    background-color: #5a5f7c;
-    color: #ffffff;
-    text-decoration: none;
-    margin-top: 1rem;
-    padding: 0.5rem 1.2rem;
-    border-radius: 6px;
-    display: inline-block;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-} */
 
 @media (max-width: 600px) {
     .header {

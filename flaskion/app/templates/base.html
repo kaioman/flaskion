@@ -30,19 +30,18 @@
         </nav>
         <!-- サインイン -->
         <div class="auth-area">
-            {% if current_user %}
-                <div class="user-menu">
-                    <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" class="user-icon">
-                    <span class="username">{{ current_user.email }}</span>
-                    <div class="dropdown">
-                        <a href="{{ url_for('root.settings') }}">設定</a>
-                        <a href="#">ログアウト</a>
-                    </div>
+            <!-- ログイン時に表示 -->
+            <div class="user-menu" style="display:none;">
+                <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" class="user-icon">
+                <span class="username" id="username"></span>
+                <div class="dropdown">
+                    <a href="{{ url_for('root.settings') }}">設定</a>
+                    <a href="#" onclick="logout()">ログアウト</a>
                 </div>
-            {% else %}
-                <a href="{{ url_for('root.signin') }}" class="signin">サインイン</a>
-                <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" alt="User Icon" class="user-icon">
-            {% endif %}
+            </div>
+            <!-- 未ログイン時に表示 -->
+            <a href="{{ url_for('root.signin') }}" class="signin">サインイン</a>
+            <img src="{{ url_for('static', filename='images/account_circle_64x64.png') }}" alt="User Icon" class="user-icon">
         </div>
     </header>
 

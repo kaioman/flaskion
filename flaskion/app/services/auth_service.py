@@ -72,7 +72,10 @@ class AuthService:
             return None, AuthError.INACTIVE_ACCOUNT
         
         # トークン生成
-        token = create_access_token({"sub": str(user.id)})
+        token = create_access_token({
+            "sub": str(user.id), 
+            "email": user.email
+        })
         
         # 最終ログイン日時更新
         user.last_login_at = datetime.now(timezone.utc)

@@ -146,6 +146,13 @@ function setupImageGenerateion() {
             } else if (response.isBadRequest()) {
                 // プロンプト未入力メッセージ表示
                 msgMgr.show(response.body.message, MessageType.WARNING, "入力エラー", response.status);
+            } else if (response.isUnauthorized()) {
+                // 未認証であることを通知するメッセージ表示
+                msgMgr.show(response.body.message, MessageType.WARNING, "認証エラー", response.status);
+                // 未認証の場合はログインページへ遷移する
+                setTimeout(() => {
+                    window.location.href = "/signin";
+                }, 800);
             } else {
                 // 内部エラーメッセージ表示
                 msgMgr.show(response.body.message, MessageType.ERROR, "サーバー側でエラーが発生しました", response.status);

@@ -1,15 +1,15 @@
 import os
 import sys
 import time
-from flask import Flask, g, session
+from flask import Flask, g
 from flask_socketio import SocketIO
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 from app.routes import register_routes
 from app.core.config import settings
 from app.core.logging import init_logging
+from app.core.security import get_current_user
 from app.core.version import APP_VERSION
-from app.models.user import User
 from app.db.session import db
 
 # FlaskアプリケーションとSocketIOの初期化
@@ -27,8 +27,8 @@ def load_user():
     """
     リクエストごとにユーザーをロードする
     """
-    email = session.get("email")
-    g.current_user = db.query(User).filter_by(email=email).first() if email else None
+    current_user, _, _ = get_current_user()
+    g.current_user = current_user
 
 @app.context_processor
 def inject_user():

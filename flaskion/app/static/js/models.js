@@ -43,6 +43,15 @@ export class ResponseModel {
     }
 
     /**
+     * レスポンスが HTTP 401（認証エラー）かどうかを判定する。
+     * 
+     * @returns {boolean} UNAUTHORIZED なら true
+     */
+    isUnauthorized() {
+        return this.status == HttpStatus.UNAUTHORIZED;
+    }
+
+    /**
      * レスポンスがサーバーエラー（500 以上）かどうかを判定する。
      * 
      * @returns {boolean} サーバーエラーなら true

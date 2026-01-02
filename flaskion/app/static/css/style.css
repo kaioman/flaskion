@@ -85,6 +85,17 @@ body {
     cursor: pointer;
 }
 
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+@media (max-width: 750px) {
+    .page-container {
+        padding: 0.75rem;
+    }
+}
+
 .footer {
     display: flex;
     justify-content: space-between;

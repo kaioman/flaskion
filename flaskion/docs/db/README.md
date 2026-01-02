@@ -24,15 +24,25 @@ Additional tables should follow the same documentation format and be added to th
 
 ## Related Artifacts
 
-Database documentation is complemented by:
+Uwgen's database schema is defined and initialized through the following artifacts:
 
-- **DDL files** in `db/schema/`
-  (Static SQL definitions for schema creation)
+### **DDL files**
 
-- **Alembic migrations** in `/alembic/`
-  (Versioned schema evolution)
+  Static SQL definitions for database creation and schema initialization are located in:
 
-These three layers together form Uwgen's complete database contract.
+```text
+/docker-container/postgres-init/
+  ├── 01-create-db.sql    ← Database creation
+  └── 02-init-db.sql      ← Initial schema definitions
+```
+
+These files are executed automatically when the PostgreSQL container is first initialized.
+
+### **Schema migrations**
+
+Uwgen does not currently use Alembic for schema versioning.
+If schema evolution becomes necessary in the future, Alembic (or another migration tool) may be introduced.
+Any future migration system must remain consistent with the documentation in this directory.
 
 ## Conventions
 
@@ -40,13 +50,17 @@ These three layers together form Uwgen's complete database contract.
 - All timestamps use UTC unless otherwise specified.
 - Primary keys should use UUID unless there is a strong reason not to.
 - Sensitive data (e.g., passwords, API keys) must never be stored in plaintext.
+- Authentication token (JWT) are **not** stored in the database.
+  Uwgen uses stateless JWT-based authentication, and the database stores only persistent user information.
 
 ## Versioning
 
 Schema changes must be reflected in:
 
 1. The relevant Markdown table specification
-2. The DDL files
-3. The Alembic migration scripts
+2. The DDL files in `/docker-container/postgres-init/`
+3. Any future migration scripts (if a migration system is introduced)
 
 This ensures consistency across documentation, development, and production environments.
+
+---

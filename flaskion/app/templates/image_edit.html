@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% import "components.html" as ui %}
+
+<!-- ページタイトル -->
+{% block title %}画像編集 | Uwgen{% endblock %}
+
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/image_edit.css') }}">
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<section class="hero hero--compact">
+    <h1>画像編集</h1>
+    <p>画像をアップロードし、編集内容を指定して生成します</p>
+</section>
+
+<main class="gen-container">
+    <!-- 入力フォーム -->
+    <form class="edit-form" method="post" enctype="multipart/form-data" novalidate>
+
+        <div class="edit-top-grid">
+
+            <!-- 左：アップロード＋プレビュー -->
+            <div class="upload-area">
+                <label for="sourceImage"><span class="req">*</span>編集元画像</label>
+                <input type="file" id="sourceImage" name="sourceImage" accept="image/*">
+                <!-- プレビュー -->
+                <div class="image-preview" id="imagePreview">
+                    <p>ここにアップロードした画像が表示されます</p>
+                </div>
+            </div>
+
+            <!-- 右：プロンプト -->
+            <div class="prompt-area">
+                <label for="prompt"><span class="req">*</span>プロンプト</label>
+                <textarea id="prompt" name="prompt" rows="6" 
+                    required
+                    placeholder="プロンプトを入力"></textarea>
+            </div>
+
+        </div>
+
+        <!-- 生成条件 -->
+        <div class="form-grid">
+            <!-- モデル -->
+            {{ ui.render_select("model", "モデル", models, selected_model, display="name") }}
+            <!-- 解像度 -->
+            {{ ui.render_select("resolution", "解像度", resolutions, selected_resolution, display="name_value") }}
+            <!-- アスペクト比 -->
+            {{ ui.render_select("aspect", "アスペクト比", aspects, selected_aspect, display="name_value") }}
+            <!-- 安全フィルター -->
+            {{ ui.render_select("safety_filter", "安全フィルター", safety_filters, selected_safety_filter, display="name") }}
+            <!-- 安全フィルタリングレベル -->
+            {{ ui.render_select("safety_level", "安全フィルタリングレベル", safety_levels, selected_safety_level, display="name") }}
+        </div>
+
+        <!-- ボタンエリア -->
+        <div class="form-row actions">
+            <button id="editBtn" class="btn blue">編集する</button>
+            <button class="btn" type="reset">リセット</button>
+        </div>
+
+        <!-- オーバーレイ + スピナー -->
+        <div id="overlay" class="overlay" style="display:none;">
+            <div class="spinner"></div>
+        </div>
+    </form>
+
+    <!-- 結果表示エリア -->
+    <section class="result">
+        <h2>編集結果</h2>
+        <div class="message-area"></div>
+        <div class="result-list"></div>
+    </section>
+
+    <!-- 結果カードのテンプレート-->
+    <template id="result-card-template">
+        <div class="result-card">
+            <img class="result-img" alt="編集画像">
+            <div class="result-meta">
+                <button class="btn download-btn">ダウンロード</button>
+                <button class="btn preview-btn">画像を拡大</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- 画像拡大モーダル表示 -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+</main>
+<!-- JS 読込 -->
+<script type="module" defer src="{{ url_for('static', filename='js/image_edit.js') }}"></script>
+{% endblock %}

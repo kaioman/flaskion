@@ -23,13 +23,25 @@
         <div class="edit-top-grid">
 
             <!-- 左：アップロード＋プレビュー -->
-            <div class="upload-area">
-                <label for="sourceImage"><span class="req">*</span>編集元画像</label>
-                <input type="file" id="sourceImage" name="sourceImage" accept="image/*">
-                <!-- プレビュー -->
-                <div class="image-preview" id="imagePreview">
-                    <p>ここにアップロードした画像が表示されます</p>
+            <div class="image-preview-wrapper">
+                
+                <input type="file" id="sourceImage" name="sourceImage" accept="image/*" style="display:none;">
+
+                <!-- ラベル＋ファイル名 -->
+                <div class="label-row">
+                    <label for="sourceImage"><span class="req">*</span>編集元画像</label>
+                    <span class="file-name-inline" id="fileNameInline"></span>
                 </div>
+
+                <!-- プレビュー本体 -->
+                <div class="image-preview" id="imagePreview">
+                    <p id="previewPlaceholder">ここにアップロードした画像が表示されます</p>
+                    <img id="previewImage" src="" alt="preview" style="display:none;">
+                </div>
+
+                <!-- 画像の上に重ねる際選択ボタン -->
+                <button type="button" id="fileSelectBtn" class="file-select-btn">ファイル選択</button>
+
             </div>
 
             <!-- 右：プロンプト -->
@@ -41,6 +53,9 @@
             </div>
 
         </div>
+
+        <!-- ファイル名表示 -->
+        <div class="file-name" id="fileName"></div>
 
         <!-- 生成条件 -->
         <div class="form-grid">

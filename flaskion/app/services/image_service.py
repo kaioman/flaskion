@@ -4,12 +4,15 @@ from datetime import datetime, timezone
 from http import HTTPStatus
 from flask import url_for
 from pydantic import ValidationError
+from PIL import Image as PIL_image
+from werkzeug.datastructures import FileStorage
 from pycorex.gemini_client import GeminiClient
 from pycorex.exceptions.no_candidates_error import NoCandidatesError
 from app.core.config import settings
 from app.core.enums import EncryptionKeyType
-from app.core.errors import ImageGenError
+from app.core.errors import ImageGenError, ImageEditError
 from app.models.image_gen_params import ImageGenParams
+from app.models.image_edit_params import ImageEditParams
 from app.models.user import User
 from app.services.encrypt_service import EncryptService
 
@@ -62,6 +65,96 @@ class ImageGenService:
                 safety_filter_level = params.safety_level
             )
             app_logger.info(f"[ImageGenService] Image generation completed. result_count={len(response['result'])}")
+            
+        except NoCandidatesError as e:
+            app_logger.error(e)
+            return ImageGenError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
+        except Exception as e:
+            app_logger.error(e)
+            return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
+
+        # 出力先パス取得・作成
+        MEDIA_DIR = settings.MEDIA_ROOT / settings.GEN_IMAGE_DIR / str(current_user.id)
+        MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+        app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
+        
+        # 画像ファイルを出力する
+        results: list[str] = []
+        for _, image_bytes in enumerate(response["result"]):
+            filename = ImageGenService.get_gen_filename()
+            output_path = MEDIA_DIR / filename
+            with open(output_path, "wb") as f:
+                f.write(image_bytes)
+            results.append(filename)
+            app_logger.info(f"[ImageGenService] Saved image: {filename}")
+
+        # public URLに変換してリスト化する
+        public_urls = [
+            url_for("image_gen_api.get_image", image_id=image_id, _external=True)
+            for image_id in results
+        ]
+        app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
+        
+        # 生成した画像のパスを返す
+        app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
+        return public_urls, HTTPStatus.OK
+    
+    @staticmethod
+    def edit_image(current_user: User, param_data: dict, source_image: FileStorage):
+        
+        app_logger.info(f"[ImageGenService] Start image edit. user_id={current_user.id}")
+
+        try:
+            # フォームの入力値をパラメーターモデルクラスに設定する
+            params = ImageEditParams(**param_data)
+            app_logger.info(f"[ImageGenService] Parameters validated. prompt_length={len(params.prompt)}")
+        except ValidationError:
+            app_logger.error(f"[ImageGenService] Parameters validation failed. user_id={current_user.id}")
+            return ImageGenError.INVALID_PARAMETER, HTTPStatus.INTERNAL_SERVER_ERROR
+        
+        # プロンプト入力チェック
+        if not params.prompt:
+            app_logger.warning(f"[ImageGenService] Missing prompt. user_id={current_user.id}")
+            return ImageGenError.MISSING_PROMPT, HTTPStatus.BAD_REQUEST
+        
+        # 元画像入力チェック
+        if not source_image:
+            app_logger.warning(f"[ImageGenService] Missing source image file. user_id={current_user.id}")
+            return ImageEditError.MISSING_SOURCE_IMAGE_NOT_FOUND, HTTPStatus.BAD_REQUEST
+        
+        # 暗号化されたAPIキーを取得
+        ciphertext = current_user.gemini_api_key_vertexai_encrypted
+        if not ciphertext:
+            app_logger.error(f"[ImageGenService] Missing API key. user_id={current_user.id}")
+            return ImageGenError.MISSING_GEMINI_API_KEY, HTTPStatus.BAD_REQUEST
+        
+        # APIキーを復号する
+        app_logger.info(f"[ImageGenService] Encrypted API key found. user_id={current_user.id}")
+        api_key = ImageGenService.get_api_key(ciphertext)
+        app_logger.info(f"[ImageGenService] API key decrypted. user_id={current_user.id}")
+
+        # 元画像のバイナリデータを取得する
+        base_image = PIL_image.open(source_image.stream)
+        
+        # GeminiClientを初期化
+        client = GeminiClient(
+            api_key=api_key
+        )
+        app_logger.info(f"[ImageGenService] GeminiClient initialized.")
+        
+        # 画像編集を実行
+        try:
+            app_logger.info(f"[ImageGenService] Editing image... user_id={current_user.id}")
+            response = client.edit_image(
+                prompt=params.prompt,
+                model=params.model,
+                base_image=base_image,
+                aspect_ratio=params.aspect,
+                image_size=params.resolution,
+                harm_category = params.safety_filter,
+                safety_filter_level = params.safety_level
+            )
+            app_logger.info(f"[ImageGenService] Image edit completed. result_count={len(response['result'])}")
             
         except NoCandidatesError as e:
             app_logger.error(e)

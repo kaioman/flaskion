@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // 入力チェック、リセット処理
     setupValidation();
 
+    // アップロード画像のプレビュー処理
+    setupImagePreview();
+
     // 画像編集ボタンの非同期処理
     setupImageEdit();
 
@@ -37,6 +40,48 @@ function setupValidation() {
         }
     });
 
+}
+
+/**
+ * アップロード画像のプレビュー表示
+ */
+function setupImagePreview() {
+    const input = document.querySelector("#sourceImage");
+    const img = document.querySelector("#previewImage");
+    const palceholder = document.querySelector("#previewPlaceholder");
+    const fileSelectBtn = document.querySelector("#fileSelectBtn");
+    const fileNameInline = document.querySelector("#fileNameInline");
+
+    // ファイル選択ボタン -> inputクリック
+    fileSelectBtn.addEventListener("click", () => {
+        input.click();
+    });
+
+    // ファイル選択時
+    input.addEventListener("change", () => {
+
+        // ファイル選択
+        const file = input.files[0];
+        if (!file) {
+            img.style.display = "none";
+            palceholder.style.display = "block";
+            img.src = "";
+            fileNameInline.textContent = "";
+            return;
+        }
+
+        // ファイル名表示
+        fileNameInline.textContent = `ファイル名: ${file.name}`;
+
+        // プレビュー表示
+        const reader = new FileReader();
+        reader.onload = e => {
+            img.src = e.target.result;
+            img.style.display = "block";
+            palceholder.style.display = "none";
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
 /**
@@ -103,16 +148,20 @@ function setupImageEdit() {
     });
 
     // 画像編集ボタンクリック時イベントハンドラ追加
-    editBtn.addEventListener("click", async function() {
+    editBtn.addEventListener("click", async function(e) {
+
+        // フォームの通常送信を止める
+        e.preventDefault();
+
         overlay.style.display = "flex";
         editBtn.disabled = true;
 
         // 入力値を回収
-        const payload = Object.fromEntries(new FormData(form));
+        const formData = new FormData(form);
 
         try {
             // サーバーにPOSTリクエストを送信して結果を受け取る
-            const response = await HttpClient.post("/api/v1/image_edit", payload);
+            const response = await HttpClient.post("/api/v1/image_edit", formData);
 
             // 結果リストをクリア
             msgMgr.clear();

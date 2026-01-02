@@ -99,3 +99,12 @@ class ImageGenError(Enum):
     
     IMAGE_INTERNAL_ERROR = "image_internal_error"
     """ 画像生成中に予期しないエラーが発生しました。時間をおいて再度実行してください """
+    
+class ImageEditError(Enum):
+    """
+    画像編集処理で発生するエラーコード一覧
+    """
+    
+    MISSING_SOURCE_IMAGE_NOT_FOUND = "missing_source_image_not_found"
+    """ 元画像ファイルが指定されていない """
+    

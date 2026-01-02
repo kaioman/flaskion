@@ -15,6 +15,21 @@ body {
     background-color: #1a1a1a;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav.open {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.8rem;
+    background-color: #1a1a1a;
+    padding: 1rem;
+    width: 100%;
+}
+
 .nav a {
     margin: 0 0.5rem;
     padding: 0.4rem 0.8rem;
@@ -143,10 +158,10 @@ body {
     margin-bottom: 1rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
     }
     .nav {
         display: flex;
@@ -172,7 +187,7 @@ body {
     }
 }
 
-@media (min-width: 601px) and (max-width: 1024px) {
+@media (min-width: 751px) and (max-width: 1024px) {
     .nav {
         justify-content: center;
     }
@@ -190,5 +205,22 @@ body {
     }
     .card {
         max-width: 90%;
+    }
+}
+
+.hamburger {
+    display: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+@media (max-width: 750px) {
+    .hamburger {
+        display: block;
+    }
+    .nav {
+        display: none;
     }
 }

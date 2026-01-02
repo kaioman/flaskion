@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
     setupUserMenu();
     // 認証状態の反映
     setupAuthState();
+    // ハンバーガーメニュ―セットアップ
+    setupHamburgerMenu();
 
 });
 
@@ -30,6 +32,20 @@ function setupUserMenu() {
         }
     });
 
+}
+
+/**
+ * ハンバーガーメニューセットアップ
+ */
+function setupHamburgerMenu() {
+    const hamburger = document.getElementById("hamburger");
+    const nav = document.querySelector(".nav");
+
+    document.addEventListener("click", () => {
+        if (hamburger) {
+            nav.classList.toggle("open");
+        }
+    });
 }
 
 /**

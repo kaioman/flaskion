@@ -20,11 +20,11 @@
 }
 
 .hero-image {
-    margin-top: 2rem;
     width: 45%;
+    max-width: 500px;
     height: auto;
     display: block;
-    margin: 0 auto;
+    margin: 2rem auto 0;
     border-radius: 12px;
 }
 
@@ -40,10 +40,10 @@
 .card {
     background-color: #ffffff;
     color: #000000;
-    padding: 2rem;
+    padding: 1.75rem;
     border-radius: 4px;
     width: 100%;
-    max-width: 300px;
+    max-width: 285px;
     text-align: center;
     border: 1px solid #000000;
 }
@@ -66,12 +66,11 @@
         padding: 2rem 1rem;
     }
     .hero h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         line-height: 1.4;
     }
     .hero-image {
         width: 95%;
-        min-width: 420px;
         margin-top: 1.5rem;
     }
     .hero p {
@@ -83,7 +82,7 @@
         height: 24px;
     }
     .card {
-        max-width: 100%;
+        max-width: 90%;
     }
 }
 

@@ -14,11 +14,17 @@
 <body>
     <!-- ヘッダー -->
     <header class="header">
-        <!-- サイトロゴ -->
-        <div class="logo">
-            <a href="{{ url_for('root.index') }}">
-                <img src="{{ url_for('static', filename='images/uwgen_logo_black_bg_transparent.png') }}" alt="Uwgen">
-            </a>
+
+        <!-- ハンバーガー+ロゴ -->
+        <div class="header-left">
+            <!-- ハンバーガーメニュー -->
+            <div class="hamburger" id="hamburger">☰</div>
+            <!-- サイトロゴ -->
+            <div class="logo">
+                <a href="{{ url_for('root.index') }}">
+                    <img src="{{ url_for('static', filename='images/uwgen_logo_black_bg_transparent.png') }}" alt="Uwgen">
+                </a>
+            </div>
         </div>
         <!-- ナビゲーションボタン -->
         <nav class="nav">

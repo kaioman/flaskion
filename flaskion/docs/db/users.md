@@ -5,11 +5,17 @@
 The `users` table stores account information for Uwgen users.
 It represents the core identity record for authentication, authorization, and user-specific configuration.
 
+Uwgen uses **stateless JWT-based authentication**, meaning:
+
+- No server-side session data is stored.
+- The database contains only long-lived user information (email, password hash, encrypted API keys, etc.).
+- JWT payloads may include user identifiers such as `sub` (user ID) and `email`, but tokens themselves are **not** stored in the database.
+
 This table is designed with the following goals:
 
-- Security: no plaintext passwords or API keys.
-- Extensibility: future fields can be added without breaking existing contracts.
-- Clarity: each field has clear purpose and rationale.
+- **Security**: no plaintext passwords or API keys.
+- **Extensibility**: future fields can be added without breaking existing contracts.
+- **Clarity**: each field has clear purpose and rationale.
 
 ---
 
@@ -41,9 +47,10 @@ This table is designed with the following goals:
 ## Security Notes
 
 - `password_hash` must be generated using a secure hashing algorithm such as **bcrypt** or **argon2**.
-- `api_key_encrypted` must be encrypted using AES-256 or equivalent.
-- Decryption keys must be stored in environment variables, not in the database.
+- Encrypted fields must use AES-256 (via Fernet) or equivalent.
+- Encryption keys must be stored in environment variables, never in the database.
 - API keys must never appear in logs, error messages, or plaintext storage.
+- JWT tokens are **not** stored in this table; authentication is fully stateless.
 
 ---
 
@@ -58,10 +65,10 @@ settings API.
 The `PATCH /api/v1/settings` endpoint accepts partial updates from the client.
 Allowing arbitrary JSON keys to directly modify model attributes introduces two major risks:
 
-1. **Security risk** ー Sensitive fields such as `email`, `password_hash`, `role`, or `id` could be overwritten if not explicitly protected.
+1. **Security risk** ー Sensitive fields such as `email`, `password_hash`, or `id` could be overwritten if not explicitly protected.
 2. **Maintenance risk** ー Hard-coding a list of updatable fields in service logic can lead to silent failures when new fields are added but not registered.
 
-To avoid both problems, the model itself declares which fields are safe to update.
+To avoid these issues, the model itself declares which fields are safe to update.
 
 ### How It Works
 
@@ -155,7 +162,7 @@ During updates, the service layer reads this metadata and selects the appropriat
 - **Account creation** sets `created_at` and `updated_at`.
 - **Profile updates** modify `updated_at`.
 - **Successful login** updates `last_login_at`.
-- **API key updates** modify both `api_key_encrypted` and `api_key_updated_at`.
+- **API key updates** modify both the encrypted field and its corresponding timestamp.
 
 ---
 

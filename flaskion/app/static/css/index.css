@@ -1,1 +1,106 @@
+.hero {
+    text-align: center;
+    padding: 1rem 2rem;
+}
 
+.hero h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.hero .accent {
+    color: #4888ff;
+}
+
+.hero-icon {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.hero-image {
+    margin-top: 2rem;
+    width: 45%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+    align-items: stretch;
+}
+
+.card {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 2rem;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    border: 1px solid #000000;
+}
+
+.card:hover {
+    background-color: #f5fff5;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+}
+
+@media (max-width: 750px) {
+    .hero {
+        padding: 2rem 1rem;
+    }
+    .hero h1 {
+        font-size: 1.5rem;
+        line-height: 1.4;
+    }
+    .hero-image {
+        width: 95%;
+        min-width: 420px;
+        margin-top: 1.5rem;
+    }
+    .hero p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    .hero-icon {
+        width: 24px;
+        height: 24px;
+    }
+    .card {
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 751px) and (max-width: 1024px) {
+    .features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        justify-items: center;
+    }
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    .hero-image {
+        width: 95%;
+    }
+    .card {
+        max-width: 90%;
+    }
+}

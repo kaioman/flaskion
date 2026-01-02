@@ -22,12 +22,27 @@ body {
 }
 
 .nav.open {
+    position: absolute;
+    top: 60px;
+    left: 0;
     display: flex !important;
     flex-direction: column;
     gap: 0.8rem;
     background-color: #1a1a1a;
     padding: 1rem;
     width: 100%;
+}
+
+@media (max-width: 750px) {
+    .nav.open {
+        padding: 0.5rem 0;
+    }
+    .nav.open a {
+        margin: 0;
+        padding: 0.8rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
 
 .nav a {
@@ -70,69 +85,6 @@ body {
     cursor: pointer;
 }
 
-.hero {
-    text-align: center;
-    padding: 1rem 2rem;
-}
-
-.hero h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.hero .accent {
-    color: #4888ff;
-}
-
-.hero-icon {
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-    margin-right: 8px;
-}
-
-.hero-image {
-    margin-top: 2rem;
-    width: 45%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    border-radius: 12px;
-}
-
-.features {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    padding: 3rem 2rem;
-    align-items: stretch;
-}
-
-.card {
-    background-color: #ffffff;
-    color: #000000;
-    padding: 2rem;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 300px;
-    text-align: center;
-    border: 1px solid #000000;
-}
-
-.card:hover {
-    background-color: #f5fff5;
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-.card-icon {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 1rem;
-    border-radius: 6px;
-}
-
 .footer {
     display: flex;
     justify-content: space-between;
@@ -169,18 +121,6 @@ body {
         gap: 0.5rem;
         margin-top: 1rem;
     }
-    .hero {
-        padding: 2rem 1rem;
-    }
-    .hero h1 {
-        font-size: 1.5rem;
-    }
-    .hero-image {
-        width: 80%;
-    }
-    .card {
-        max-width: 100%;
-    }
     .btn {
         width: 100%;
         padding: 0.8rem;
@@ -190,21 +130,6 @@ body {
 @media (min-width: 751px) and (max-width: 1024px) {
     .nav {
         justify-content: center;
-    }
-    .features {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        justify-items: center;
-    }
-    .hero h1 {
-        font-size: 1.8rem;
-    }
-    .hero-image {
-        width: 60%;
-    }
-    .card {
-        max-width: 90%;
     }
 }
 

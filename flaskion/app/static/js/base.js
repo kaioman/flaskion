@@ -41,10 +41,17 @@ function setupHamburgerMenu() {
     const hamburger = document.getElementById("hamburger");
     const nav = document.querySelector(".nav");
 
+    if (!hamburger || !nav) return;
+
+    // ハンバーガーメニュークリック時イベント
+    hamburger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        nav.classList.toggle("open");
+    });
+
+    // 画面のどこかをクリックしたら閉じる
     document.addEventListener("click", () => {
-        if (hamburger) {
-            nav.classList.toggle("open");
-        }
+        nav.classList.remove("open");
     });
 }
 

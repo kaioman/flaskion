@@ -1,4 +1,4 @@
-from .errors import AuthError, RequestError, UserError, ImageGenError
+from .errors import AuthError, RequestError, UserError, ImageGenError, ImageEditError
 
 AUTH_ERROR_MESSAGES = {
     AuthError.EMAIL_EXISTS: "入力されたEmailアドレスは既に登録されています",
@@ -33,6 +33,11 @@ IMAGE_GEN_ERROR_MESSAGE = {
 }
 """ 画像生成処理系エラーメッセージ """
 
+IMAGE_EDIT_ERROR_MESSAGE = {
+    ImageEditError.MISSING_SOURCE_IMAGE_NOT_FOUND: "元画像ファイルが指定されていません",
+}
+""" 画像編集処理系エラーメッセージ """
+
 def get_error_message(err) -> str:
     """
     エラーレスポンスクラスごとにメッセージを取得する
@@ -63,6 +68,10 @@ def get_error_message(err) -> str:
     # ImageGenErrorの場合
     if isinstance(err, ImageGenError):
         return IMAGE_GEN_ERROR_MESSAGE.get(err, "Unknown user error")
+
+    # ImageEditErrorの場合
+    if isinstance(err, ImageEditError):
+        return IMAGE_EDIT_ERROR_MESSAGE.get(err, "Unknown user error")
     
     # その他エラー
     return "Unknown error"

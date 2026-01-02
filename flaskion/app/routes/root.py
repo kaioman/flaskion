@@ -65,7 +65,6 @@ def image_gen():
     画像生成ページを表示するルート
     
     - GET: Geminiモデル一覧を取得し、フォームを表示する
-    - POST: フォームから送信された生成条件に基づき、画像生成処理を行い結果を表示する
 
     Returns
     -------
@@ -101,6 +100,45 @@ def image_gen():
         error=error
     )
 
+@root_bp.get("/image_edit")
+def image_edit():
+    """
+    画像編集ページを表示するルート
+    
+    - GET: Geminiモデル一覧を取得し、フォームを表示する
+
+    Returns
+    -------
+    str
+        imaeg_edit.html テンプレートをレンダリングした HTML
+        編集画像のパス、生成条件を含む
+    """
+    
+    # 各種列挙体を取得
+    gemini_models = ImageGenService.get_image_models()
+    image_sizes = ImageGenService.get_resolutions()
+    image_aspects = ImageGenService.get_aspects()
+    image_safety_filters = ImageGenService.get_safety_filters()
+    image_safety_levels = ImageGenService.get_safety_levels()
+    
+    # 変数初期化
+    error: Optional[str] = None
+    
+    return render_template(
+        "image_edit.html", 
+        models=gemini_models,
+        resolutions=image_sizes,
+        aspects=image_aspects,
+        safety_filters=image_safety_filters,
+        safety_levels=image_safety_levels,
+        selected_model=GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW.value,
+        selected_resolution=GeminiClient.ImageSize.ONE_K.value,
+        selected_aspect=GeminiClient.AspectRatio.SQUARE.value,
+        selected_safety_filter=GeminiClient.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT.value,
+        selected_safety_level=GeminiClient.SafetyFilterLevel.BLOCK_ONLY_HIGH.value,
+        error=error
+    )
+    
 @root_bp.route("/test", methods=["GET", "POST"])
 def test():
     

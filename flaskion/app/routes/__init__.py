@@ -22,3 +22,7 @@ def register_routes(app:Flask):
     # image_genルート
     from app.api.v1.image_gen import bp as image_gen_bp
     app.register_blueprint(image_gen_bp)
+
+    # image_editルート
+    from app.api.v1.image_edit import bp as image_edit_bp
+    app.register_blueprint(image_edit_bp)

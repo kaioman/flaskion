@@ -24,15 +24,18 @@ export class HttpClient {
      */
     static async post(url, payload, { auth = true, headers = {} } = {}) {
         try {
+            // payload判定
+            const isFormData = payload instanceof FormData;
+
             // ヘッダー作成
-            const finalHeaders = auth
+            const finalHeaders = isFormData
                 ? {
-                    "Content-Type":  "application/json",
-                    ...HttpClient.defaultHeaders(), 
+                    ...(auth ? HttpClient.defaultHeaders() : {}), 
                     ...headers 
                 }
                 : {
                     "Content-Type":  "application/json",
+                    ...(auth ? HttpClient.defaultHeaders() : {}), 
                     ...headers
                 };
 
@@ -40,7 +43,7 @@ export class HttpClient {
             const response = await fetch(url, {
                 method : "POST",
                 headers: finalHeaders,
-                body: JSON.stringify(payload)
+                body: isFormData ? payload : JSON.stringify(payload)
             });
             
             // レスポンスチェック

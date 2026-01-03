@@ -5,6 +5,7 @@ from app.schemas.auth import (
     SigninRequestSchema, SigninResponseSchema
 )
 from app.services.auth_service import AuthService
+from app.core.security import get_current_user
 from app.core.errors import AuthError, RequestError
 from app.models.response.errors import ErrorResponse
 from app.models.response.success import SuccessResponse
@@ -64,4 +65,26 @@ def signin():
             "access_token": token,
             "token_type": "Bearer"
         })
+    )
+    
+@bp.get("/me")
+def get_me():
+    """
+    カレントユーザーを返すエンドポイント
+    - 認証済み -> 200 + ユーザー情報
+    - 未認証 -> 400
+    """
+    
+    # 認証チェック
+    current_user, error, status = get_current_user()
+    if error:
+        return ErrorResponse.from_error(error, status)
+    
+    # 認証済み
+    return SuccessResponse.ok(
+        data = {
+            "id": current_user.id,
+            "email": current_user.email
+        },
+        status=HTTPStatus.OK
     )

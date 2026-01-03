@@ -1,3 +1,5 @@
+import { HttpClient } from "./utils.js";
+
 /**
  * ページロード時処理
  */
@@ -65,23 +67,31 @@ function getToken() {
 /**
  * 認証状態に応じてUIを切り替える
  */
-function setupAuthState() {
-    const token = getToken();
+async function setupAuthState() {
     const userMenu = document.querySelector(".user-menu");
     const signinLink = document.querySelector(".signin");
     const userIcon = document.querySelector(".auth-area > .user-icon");
 
-    if (token) {
-        // ログイン状態
-        if (signinLink) signinLink.style.display = "none";
-        if (userIcon) userIcon.style.display = "none";
-        if (userMenu) userMenu.style.display = "flex";
+    try {
+        // サーバーにカレントユーザー情報を問い合わせる
+        const res = await HttpClient.get("/api/v1/auth/me", { auth: true });
+        
+        if (res.isSuccess()) {
+            // ログイン状態
+            if (signinLink) signinLink.style.display = "none";
+            if (userIcon) userIcon.style.display = "none";
+            if (userMenu) userMenu.style.display = "flex";
 
-        // JWTからemailを取り出して表示する
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        document.getElementById("username").textContent = payload.email;
-    } else {
-        // 未ログイン状態
+            // JWTからemailを取り出して表示する
+            document.getElementById("username").textContent = res.body.data.email;
+        } else {
+            // 未ログイン状態
+            if (signinLink) signinLink.style.display = "block";
+            if (userIcon) userIcon.style.display = "inline";
+            if (userMenu) userMenu.style.display = "none";
+        }
+    } catch (err) {
+        // 通信エラー時は未ログインとする
         if (signinLink) signinLink.style.display = "block";
         if (userIcon) userIcon.style.display = "inline";
         if (userMenu) userMenu.style.display = "none";

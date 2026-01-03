@@ -36,6 +36,9 @@ class Settings:
     
     # 生成画像ディレクトリ
     GEN_IMAGE_DIR: str = "generated"
+
+    # 編集画像ディレクトリ
+    EDIT_IMAGE_DIR: str = "edited"
     
 # インスタンス生成
 settings = Settings()

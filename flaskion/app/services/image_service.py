@@ -6,10 +6,11 @@ from flask import url_for
 from pydantic import ValidationError
 from PIL import Image as PIL_image
 from werkzeug.datastructures import FileStorage
+from datetime import date
 from pycorex.gemini_client import GeminiClient
 from pycorex.exceptions.no_candidates_error import NoCandidatesError
 from app.core.config import settings
-from app.core.enums import EncryptionKeyType
+from app.core.enums import EncryptionKeyType, ImagePathType
 from app.core.errors import ImageGenError, ImageEditError
 from app.models.image_gen_params import ImageGenParams
 from app.models.image_edit_params import ImageEditParams
@@ -74,7 +75,7 @@ class ImageGenService:
             return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
 
         # 出力先パス取得・作成
-        MEDIA_DIR = settings.MEDIA_ROOT / settings.GEN_IMAGE_DIR / str(current_user.id)
+        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.GENERATED.value, current_user.id)
         MEDIA_DIR.mkdir(parents=True, exist_ok=True)
         app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
         
@@ -90,7 +91,7 @@ class ImageGenService:
 
         # public URLに変換してリスト化する
         public_urls = [
-            url_for("image_gen_api.get_image", image_id=image_id, _external=True)
+            url_for("image_gen_api.get_image", path_type=ImagePathType.GENERATED.value, image_id=image_id, _external=True)
             for image_id in results
         ]
         app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
@@ -164,7 +165,7 @@ class ImageGenService:
             return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
 
         # 出力先パス取得・作成
-        MEDIA_DIR = settings.MEDIA_ROOT / settings.GEN_IMAGE_DIR / str(current_user.id)
+        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.EDITED.value, current_user.id)
         MEDIA_DIR.mkdir(parents=True, exist_ok=True)
         app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
         
@@ -180,7 +181,7 @@ class ImageGenService:
 
         # public URLに変換してリスト化する
         public_urls = [
-            url_for("image_gen_api.get_image", image_id=image_id, _external=True)
+            url_for("image_gen_api.get_image", path_type=ImagePathType.EDITED.value, image_id=image_id, _external=True)
             for image_id in results
         ]
         app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
@@ -199,6 +200,19 @@ class ImageGenService:
         unique = uuid.uuid4().hex
         return f"{timestamp}_{unique}.png"
 
+    @staticmethod
+    def get_image_path(path_type: str, current_user_id):
+        # 日付フォルダ
+        data_str = date.today().isoformat()
+        # ルートパス
+        root_path = settings.MEDIA_ROOT / str(current_user_id)
+        # 出力先パス構成
+        if path_type == ImagePathType.GENERATED.value:
+            return root_path / settings.GEN_IMAGE_DIR / data_str
+        elif path_type == ImagePathType.EDITED.value:
+            return root_path / settings.EDIT_IMAGE_DIR / data_str
+        return root_path
+    
     @staticmethod
     def get_api_key(ciphertext):
         """

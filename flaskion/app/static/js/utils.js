@@ -89,7 +89,11 @@ export class HttpClient {
             const body = await response.json();
 
             // レスポンスをJSONとして返却する
-            return { status: response.status, body: body };
+            return new ResponseModel({
+                status: response.status,
+                body: body,
+            });
+
         } catch (error) {
             // 通信エラーやサーバーエラーを呼び出し元に伝える
             throw error;

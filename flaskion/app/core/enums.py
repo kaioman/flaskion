@@ -10,3 +10,14 @@ class EncryptionKeyType(Enum):
     
     UWGEN = "uwgen"
     """ UWGEN """
+    
+class ImagePathType(Enum):
+    """
+    画像出力先パス種類
+    """
+    
+    GENERATED = "gen"
+    """ 画像生成 """
+    
+    EDITED = "edit"
+    """ 画像編集 """

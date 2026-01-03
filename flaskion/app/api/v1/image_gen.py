@@ -38,8 +38,8 @@ def image_gen():
     else:
         return ErrorResponse.from_error(results, status)
 
-@bp.get("/images/<image_id>")
-def get_image(image_id):
+@bp.get("/images/<path_type>/<image_id>")
+def get_image(path_type: str, image_id: str):
     """
     画像取得API
     """
@@ -50,8 +50,7 @@ def get_image(image_id):
         return ErrorResponse.from_error(error, status)
 
     # 保存先ディレクトリ取得
-    media_root = settings.MEDIA_ROOT
-    user_dir = media_root / settings.GEN_IMAGE_DIR / str(current_user.id)
+    user_dir = ImageGenService.get_image_path(path_type, current_user.id)
 
     # ユーザーディレクトリチェック
     if not user_dir.exists():

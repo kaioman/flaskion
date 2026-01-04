@@ -40,9 +40,15 @@
     <!-- 画像一覧 -->
     <div class="gallery-grid" id="galleryGrid"></div>
 
+    <!-- もっと見るボタン -->
+    <div class="load-more-container">
+        <button id="loadMoreBtn" class="btn load-more-btn">もっと見る</button>
+    </div>
+
     <!-- 画像カードテンプレート -->
     <template id="gallery-card-template">
         <div class="gallery-card">
+            <div class="spinner-image-loading"></div>
             <img class="gallery-img" alt="image">
             <div class="card-actions">
                 <button class="preview-btn">拡大</button>

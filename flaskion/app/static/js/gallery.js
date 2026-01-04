@@ -20,6 +20,7 @@ function setupGallery() {
     const filterBtns = document.querySelectorAll(".filter-btn");
     const sortSelect = document.getElementById("sortSelect");
     const template = document.getElementById("gallery-card-template");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
     const messageArea = document.querySelector(".message-area");
 
     // メッセージマネージャーインスタンス
@@ -27,6 +28,9 @@ function setupGallery() {
 
     let currentFilter = "all";
     let currentSort = "newest";
+    let offset = 0;
+    const limit = 20;
+    let total = 0;
 
     // 初回ロード
     loadGallery();
@@ -48,11 +52,21 @@ function setupGallery() {
         loadGallery();
     });
 
-    // ギャラリー読込
-    async function loadGallery() {
-        grid.innerHTML = "";
+    // もっと見るボタン
+    loadMoreBtn.addEventListener("click", () => {
+        loadGallery(true);
+    });
 
-        const url = `/api/v1/gallery?type=${currentFilter}&sort=${currentSort}`;
+    // ギャラリー読込
+    async function loadGallery(isAppend = false) {
+
+        if (!isAppend) {
+            offset = 0;
+            grid.innerHTML = "";
+        }
+
+        // ギャラリー一覧をリクエスト
+        const url = `/api/v1/gallery?type=${currentFilter}&sort=${currentSort}&offset=${offset}&limit=${limit}`;
         const response = await HttpClient.get(
             url,
             { auth: true }
@@ -67,26 +81,46 @@ function setupGallery() {
             return;
         }
 
+        // ギャラリーの取得
+        const images = response.body.data.images;
+        total = response.body.data.total;
+
         // 画像0件の場合
-        if (response.body.data.images.length === 0) {
+        if (images.length === 0) {
             grid.innerHTML = "<p class='empty'>画像がありません</p>";
             return;
         }
 
         // 画像をギャラリーにカード形式で表示
-        for (const img of response.body.data.images) {
+        for (const img of images) {
             const card = await createCard(img);
             grid.appendChild(card);
         }
+
+        // 読み込んだ画像の分だけoffsetを加算
+        offset += images.length;
+
+        // 「もっと見る」ボタンの表示制御
+        loadMoreBtn.style.display = (offset < total) ? "block" : "none";
 
     }
 
     async function createCard(img) {
         const node = template.content.cloneNode(true);
         const card = node.querySelector(".gallery-card");
-
         const image = node.querySelector(".gallery-img");
+        const spinner = node.querySelector(".spinner-image-loading");
+        
+        // Blob URLを取得
+        image.src = "";
         const objectUrl = await HttpClient.getBlobUrl(img.path);
+
+        // 画像読込完了イベント
+        image.onload = () => {
+            spinner.style.display = "none";
+        };
+
+        // 読み込み開始
         image.src = objectUrl;
 
         const previewBtn = node.querySelector(".preview-btn");

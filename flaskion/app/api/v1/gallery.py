@@ -21,15 +21,22 @@ def get_gallery():
     # クエリパラメーター
     filter_type = request.args.get("type", "all")
     sort_order = request.args.get("sort", "newest")
+    offset = request.args.get("offset", default=0, type=int)
+    limit = request.args.get("limit", default=20, type=int)
     
     # 画像取得サービス呼び出し
-    images = GalleryService.get_user_images(
+    results = GalleryService.get_user_images(
         current_user_id=current_user.id,
         filter_type=filter_type,
-        sort_order=sort_order
+        sort_order=sort_order,
+        offset=offset,
+        limit=limit
     )
     
     return SuccessResponse.ok(
-        data={"images": images},
+        data={
+            "images": results["images"], 
+            "total": results["total"],
+        },
         status=HTTPStatus.OK
     )

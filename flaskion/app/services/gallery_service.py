@@ -6,7 +6,7 @@ from app.services.image_service import ImageGenService
 class GalleryService:
     
     @staticmethod
-    def get_user_images(current_user_id, filter_type, sort_order):
+    def get_user_images(current_user_id, filter_type, sort_order, offset=0, limit=20):
         
         # 画像保存ルートパス取得
         root_path = ImageGenService.get_root_image_path(current_user_id)
@@ -52,4 +52,10 @@ class GalleryService:
             reverse=reverse
         )
         
-        return results
+        # ページング
+        paged = results[offset: offset + limit]
+        
+        return {
+            "images": paged,
+            "total": len(results)
+        }

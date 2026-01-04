@@ -47,6 +47,15 @@
     gap: 1rem;
 }
 
+.gallery-img {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-card.loaded .gallery-img {
+    opacity: 1;
+}
+
 .gallery-card {
     position: relative;
     overflow: hidden;
@@ -54,6 +63,28 @@
     cursor: pointer;
     background: #fafafa;
     border: 1px solid #ddd;
+}
+
+.gallery-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #eee;
+    animation: pulse 1.2s infinite;
+}
+
+.gallery-card.loaded::before {
+    display: none;
+}
+
+.gallery-card.loaded .spinner-image-loading {
+    display: none;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
 }
 
 .gallery-card img {

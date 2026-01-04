@@ -117,7 +117,9 @@ function setupGallery() {
 
         // 画像読込完了イベント
         image.onload = () => {
-            spinner.style.display = "none";
+            //spinner.style.display = "none";
+            card.classList.add("loaded");
+            image.style.opacity = "1";
         };
 
         // 読み込み開始

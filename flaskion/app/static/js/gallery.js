@@ -22,6 +22,8 @@ function setupGallery() {
     const template = document.getElementById("gallery-card-template");
     const loadMoreBtn = document.getElementById("loadMoreBtn");
     const messageArea = document.querySelector(".message-area");
+    const modalEditBtn = document.getElementById("editBtn");
+    const modalDownloadBtn = document.getElementById("downloadBtn");
 
     // メッセージマネージャーインスタンス
     const msgMgr = new MessageManager(messageArea);
@@ -105,11 +107,11 @@ function setupGallery() {
 
     }
 
+    // 画像カード作成
     async function createCard(img) {
         const node = template.content.cloneNode(true);
         const card = node.querySelector(".gallery-card");
         const image = node.querySelector(".gallery-img");
-        const spinner = node.querySelector(".spinner-image-loading");
         
         // Blob URLを取得
         image.src = "";
@@ -117,7 +119,6 @@ function setupGallery() {
 
         // 画像読込完了イベント
         image.onload = () => {
-            //spinner.style.display = "none";
             card.classList.add("loaded");
             image.style.opacity = "1";
         };
@@ -146,15 +147,50 @@ function setupGallery() {
     const modalImg = document.getElementById("modalImage");
     const closeModal = document.querySelector(".close-modal");
 
-    function openModal(path) {
+    async function openModal(path) {
         modal.style.display = "flex";
-        modalImg.src = path;
+
+        // Blob URLを取得して表示
+        const blobUrl = await HttpClient.getBlobUrl(path);
+        modalImg.src = blobUrl;
+
+        // 選択中の画像パスを保持
+        modal.dataset.currentPath = path;
+
     }
 
+    // モーダルクリック時
     closeModal.onclick = () => modal.style.display = "none";
     modal.addEventListener("click", (e) => {
         if (e.target === modal) {
             modal.style.display = "none";
         }
-    })
+    });
+
+    // モーダル：編集に送るボタンクリック時
+    modalEditBtn.onclick = () => {
+        const path = modal.dataset.currentPath;
+        window.location.href = `/image_edit?src=${encodeURIComponent(path)}`;
+    };
+
+    // モーダル：ダウンロードボタンクリック時
+    modalDownloadBtn.onclick = async () => {
+        const path = modal.dataset.currentPath;
+
+        // Blobを取得
+        const blob = await HttpClient.getBlob(path);
+
+        // ダウンロード用URLを作成
+        const blobUrl = URL.createObjectURL(blob);
+
+        // ダウンロード実行
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = path.split("/").pop();
+        a.click();
+
+        // メモリ開放
+        URL.revokeObjectURL(blobUrl);
+
+    }
 }

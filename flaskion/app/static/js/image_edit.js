@@ -7,6 +7,9 @@ import { MessageManager } from "./components.js";
  */
 document.addEventListener("DOMContentLoaded", function() {
     
+    // 遷移元から送られてきた画像をプレビューにセットする
+    loadEditImage();
+
     // 入力チェック、リセット処理
     setupValidation();
 
@@ -17,6 +20,59 @@ document.addEventListener("DOMContentLoaded", function() {
     setupImageEdit();
 
 });
+
+/**
+ * 遷移元から送られてきた画像をプレビューにセットする
+ */
+async function loadEditImage() {
+    const params = new URLSearchParams(window.location.search);
+    const src = params.get("src");
+
+    // ギャラリー経由でない場合は処理を抜ける
+    if (!src) {
+        return;
+    }
+
+    // Blob URLを取得
+    const blobUrl = await HttpClient.getBlobUrl(src);
+
+    // DOM要素取得
+    const previewImage = document.getElementById("previewImage");
+    const previewPlaceholder = document.getElementById("previewPlaceholder");
+    const fileNameInline = document.getElementById("fileNameInline");
+    const fileName = document.getElementById("fileName");
+    const sourceImageUrl = document.getElementById("sourceImageUrl");
+    const sourceImage = document.getElementById("sourceImage");
+
+    // プレビュー画像を表示
+    previewImage.src = blobUrl;
+    previewImage.style.display = "block";
+    previewPlaceholder.style.display = "none";
+
+    // ファイル名を抽出して表示
+    const extractedName = extractedFileName(src);
+    fileNameInline.textContent = extractedName;
+    fileName.textContent = extractedName;
+
+    // 画像をhiddenフィールドにセットする
+    sourceImageUrl.value = src;
+    const blob = await HttpClient.getBlob(src);
+    const file = new File([blob], extractedFileName(src), { type: blob.type });
+
+    // FormDataに入れるためにinput.filesを差し替える
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    sourceImage.files = dataTransfer.files;
+}
+
+/**
+ * API URLからファイル名を抽出する
+ * @param {string} path ファイルパス
+ * @returns ファイル名
+ */
+function extractedFileName(path) {
+    return path.split("/").pop();
+}
 
 /**
  * 入力チェック、リセット処理
@@ -81,6 +137,7 @@ function setupImagePreview() {
             palceholder.style.display = "none";
         };
         reader.readAsDataURL(file);
+
     });
 }
 

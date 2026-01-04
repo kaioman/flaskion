@@ -19,11 +19,11 @@ def image_edit():
     if error:
         return ErrorResponse.from_error(error, status)
     
+    # フォームデータ取得
+    param_data: dict = request.form.to_dict()
+
     # 元画像を取得
     source_image = request.files.get("sourceImage")
-    
-    # リクエストデータ検証
-    param_data: dict = request.form.to_dict()
     
     # ImageGenServiceで画像編集
     results, status = ImageGenService.edit_image(

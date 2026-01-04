@@ -176,4 +176,29 @@ export class HttpClient {
             throw error;
         }
     }
+
+    /**
+     * Blobを取得する
+     * @param {string} url リクエスト先のURL
+     * @param {boolean} [options.auth=true] - 認証ヘッダーを付与するかどうか
+     * @param {object} [options.headers={}] - 追加ヘッダー(任意)
+     * @returns {Promise<Blob>} - Blob
+     */
+    static async getBlob(url, { auth = true, headers = {} } = {}) {
+        try {
+            const finalHeaders = auth
+                ? { ...HttpClient.defaultHeaders(), ...headers }
+                : headers;
+            const response = await fetch(url, {
+                method: "GET",
+                headers: finalHeaders
+            });
+
+            // Blobを返す
+            return await response.blob();
+        } catch (error) {
+            // 通信エラーやサーバーエラーを呼び出し元に伝える
+            throw error;
+        }
+    }
 }

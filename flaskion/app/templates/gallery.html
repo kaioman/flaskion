@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import "components.html" as ui %}
+
+<!-- ページタイトル -->
+{% block title %}ギャラリー | Uwgen{% endblock %}
+
+<!-- スタイルシート -->
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+{% endblock %}
+
+<!-- コンテンツエリア -->
+{% block content %}
+<section class="hero hero--compact">
+    <h1>ギャラリー</h1>
+    <p>これまで生成・編集した画像の一覧</p>
+</section>
+
+<main class="gallery-container">
+
+    <!-- フィルターバー -->
+    <div class="gallery-filter">
+        <div class="filter-left">
+            <button class="filter-btn active" data-filter="all">すべて</button>
+            <button class="filter-btn" data-filter="gen">生成</button>
+            <button class="filter-btn" data-filter="edit">編集</button>
+        </div>
+
+        <div class="filter-right">
+            <select id="sortSelect" class="sort-select">
+                <option value="newest">日付順（新しい順）</option>
+                <option value="oldest">日付順（古い順）</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- メッセージエリア -->
+    <div class="message-area"></div>
+
+    <!-- 画像一覧 -->
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <!-- もっと見るボタン -->
+    <div class="load-more-container">
+        <button id="loadMoreBtn" class="btn load-more-btn">もっと見る</button>
+    </div>
+
+    <!-- 画像カードテンプレート -->
+    <template id="gallery-card-template">
+        <div class="gallery-card">
+            <div class="spinner-image-loading"></div>
+            <img class="gallery-img" alt="image">
+            <div class="card-actions">
+                <button class="preview-btn">拡大</button>
+                <button class="edit-btn">編集</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- 画像拡大モーダル -->
+    <div id="galleryModal" class="gallery-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="modal-actions">
+            <button class="btn blue" id="editBtn">編集へ送る</button>
+            <button class="btn" id="downloadBtn">ダウンロード</button>
+        </div>
+    </div>
+</main>
+<!-- JS 読込 -->
+<script type="module" defer src="{{ url_for('static', filename='js/gallery.js') }}"></script>
+{% endblock %}

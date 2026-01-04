@@ -74,8 +74,11 @@ class ImageGenService:
             app_logger.error(e)
             return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
 
+        # 日付フォルダ名取得
+        date_dir = date.today().isoformat()
+
         # 出力先パス取得・作成
-        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.GENERATED.value, current_user.id)
+        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.GENERATED.value, date_dir, current_user.id)
         MEDIA_DIR.mkdir(parents=True, exist_ok=True)
         app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
         
@@ -91,7 +94,7 @@ class ImageGenService:
 
         # public URLに変換してリスト化する
         public_urls = [
-            url_for("image_gen_api.get_image", path_type=ImagePathType.GENERATED.value, image_id=image_id, _external=True)
+            url_for("image_gen_api.get_image", path_type=ImagePathType.GENERATED.value, date_dir=date_dir, image_id=image_id, _external=True)
             for image_id in results
         ]
         app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
@@ -163,9 +166,11 @@ class ImageGenService:
         except Exception as e:
             app_logger.error(e)
             return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
-
+        
+        # 日付フォルダ名取得
+        date_dir = date.today().isoformat()
         # 出力先パス取得・作成
-        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.EDITED.value, current_user.id)
+        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.EDITED.value, date_dir, current_user.id)
         MEDIA_DIR.mkdir(parents=True, exist_ok=True)
         app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
         
@@ -181,7 +186,7 @@ class ImageGenService:
 
         # public URLに変換してリスト化する
         public_urls = [
-            url_for("image_gen_api.get_image", path_type=ImagePathType.EDITED.value, image_id=image_id, _external=True)
+            url_for("image_gen_api.get_image", path_type=ImagePathType.EDITED.value, date_dir=date_dir, image_id=image_id, _external=True)
             for image_id in results
         ]
         app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
@@ -201,16 +206,19 @@ class ImageGenService:
         return f"{timestamp}_{unique}.png"
 
     @staticmethod
-    def get_image_path(path_type: str, current_user_id):
-        # 日付フォルダ
-        data_str = date.today().isoformat()
+    def get_root_image_path(current_user_id):
+        return settings.MEDIA_ROOT / str(current_user_id)
+    
+    @staticmethod
+    def get_image_path(path_type: str, date_str: str, current_user_id):
+
         # ルートパス
-        root_path = settings.MEDIA_ROOT / str(current_user_id)
+        root_path = ImageGenService.get_root_image_path(current_user_id)
         # 出力先パス構成
         if path_type == ImagePathType.GENERATED.value:
-            return root_path / settings.GEN_IMAGE_DIR / data_str
+            return root_path / settings.GEN_IMAGE_DIR / date_str
         elif path_type == ImagePathType.EDITED.value:
-            return root_path / settings.EDIT_IMAGE_DIR / data_str
+            return root_path / settings.EDIT_IMAGE_DIR / date_str
         return root_path
     
     @staticmethod

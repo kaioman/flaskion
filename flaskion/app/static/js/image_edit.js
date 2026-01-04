@@ -163,7 +163,7 @@ function setupImageEdit() {
             // サーバーにPOSTリクエストを送信して結果を受け取る
             const response = await HttpClient.post("/api/v1/image_edit", formData);
 
-            // 結果リストをクリア
+            // メッセージをクリア
             msgMgr.clear();
 
             // Httpリクエストコード判定

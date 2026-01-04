@@ -27,6 +27,10 @@ def signin():
 def signup():
     return render_template("signup.html", hide_nav_items=True)
 
+@root_bp.get("/gallery")
+def gallery():
+    return render_template("gallery.html")
+
 @root_bp.get("/settings")
 def settings():
     

@@ -26,3 +26,7 @@ def register_routes(app:Flask):
     # image_editルート
     from app.api.v1.image_edit import bp as image_edit_bp
     app.register_blueprint(image_edit_bp)
+
+    # galleryルート
+    from app.api.v1.gallery import bp as image_gallery_bp
+    app.register_blueprint(image_gallery_bp)

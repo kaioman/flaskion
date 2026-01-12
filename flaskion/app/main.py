@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from flask import Flask, g
+from flask import Flask, redirect, g
 from flask_socketio import SocketIO
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
@@ -11,6 +11,7 @@ from app.core.logging import init_logging
 from app.core.security import get_current_user
 from app.core.version import APP_VERSION
 from app.db.session import db
+from app.models.current_user_result import AuthType
 
 # FlaskアプリケーションとSocketIOの初期化
 app = Flask(__name__)
@@ -27,9 +28,19 @@ def load_user():
     """
     リクエストごとにユーザーをロードする
     """
-    current_user, _, _ = get_current_user()
-    g.current_user = current_user
-
+    
+    auth = get_current_user()
+    g.current_user = auth.user
+    g.auth_type = auth.auth_type
+    
+    # APIはセッション不要
+    if auth.auth_type == AuthType.API_KEY:
+        return
+    
+    # JWTはセッション必須
+    if auth.auth_type != AuthType.SESSION:
+        return redirect("/signin")
+    
 @app.context_processor
 def inject_user():
     """

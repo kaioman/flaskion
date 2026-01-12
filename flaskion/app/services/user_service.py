@@ -5,6 +5,7 @@ from app.core.security import generate_api_key_value
 from app.core.errors import UserError
 from app.db.transaction import transactional
 from app.services.encrypt_service import EncryptService
+from app.services.hash_service import HashService
 
 class UserService:
     
@@ -33,6 +34,7 @@ class UserService:
         # APIキー生成
         new_key = generate_api_key_value()
         
+        # APIキーを返す        
         return new_key, None
 
     @staticmethod
@@ -76,7 +78,9 @@ class UserService:
                 if column.info.get("encrypt"):
                     key_type = column.info.get("key")
                     value = EncryptService.encrypt(value, key_type)
-                
+                if column.info.get("hash"):
+                    value = HashService.hash_value(value)
+                    
                 setattr(user, key, value)
         
         # Uwgen APIキーに変更があれば変更日時を更新する

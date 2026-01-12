@@ -13,6 +13,7 @@ services:
       - JWT_SECRET_KEY=change_this_secret-20251227 # JWT secret-key
       - GEMINI_KEY_SECRET=DyWGcTIoPVaj6z0XOESepWecyGj20hY6l31q1dBXWxk=
       - UWGEN_KEY_SECRET=fQxVZxoMMSVhMB7yY6CpxNmtqYq--xetC2ksxedfQ20=
+      - SESSION_COOKIE_SECURE=false
     entrypoint: [
       "/var/docker-flask/flaskion/env/bin/python", 
       "-Xfrozen_modules=off", 

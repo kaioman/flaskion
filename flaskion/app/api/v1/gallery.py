@@ -14,9 +14,9 @@ def get_gallery():
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
 
     # クエリパラメーター
     filter_type = request.args.get("type", "all")
@@ -26,7 +26,7 @@ def get_gallery():
     
     # 画像取得サービス呼び出し
     results = GalleryService.get_user_images(
-        current_user_id=current_user.id,
+        current_user_id=auth.user.id,
         filter_type=filter_type,
         sort_order=sort_order,
         offset=offset,

@@ -18,6 +18,11 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
       - GEMINI_KEY_SECRET=${GEMINI_KEY_SECRET}
       - UWGEN_KEY_SECRET=${UWGEN_KEY_SECRET}
+      - SESSION_PERMANENT=true
+      - PERMANENT_SESSION_LIFETIME_DAYS=7
+      - SESSION_COOKIE_SAMESITE=Lax
+      - SESSION_COOKIE_SECURE=true
+      - SESSION_COOKIE_HTTPONLY=true
     command: ./env/bin/gunicorn -w 4 -k gevent -b 0.0.0.0:5100 server:app
 
   uwgen_db:

@@ -15,12 +15,12 @@ def renegerate_uwgen_api_key():
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
     
     # Uwge APIキー発行
-    new_key, error = UserService.generate_uwgen_api_key(current_user.id)
+    new_key, error = UserService.generate_uwgen_api_key(auth.user.id)
     if error == UserError.USER_NOT_FOUND:
         return ErrorResponse.from_error(UserError.USER_NOT_FOUND, HTTPStatus.NOT_FOUND)
     
@@ -37,16 +37,16 @@ def update_settings():
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
     
     # リクエストデータ検証
     data = request.get_json() or {}
     
     # UserServiceで保存処理を実行
     error = UserService.update_settings(
-        user=current_user,
+        user=auth.user,
         updates=data
     )
     

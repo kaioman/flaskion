@@ -21,3 +21,17 @@ class ImagePathType(Enum):
     
     EDITED = "edit"
     """ 画像編集 """
+    
+class AuthType(Enum):
+    """
+    認証方式
+    """
+    
+    SESSION = "session"
+    """ セッション認証 """
+    
+    JWT = "jwt"
+    """ JWT認証 """
+    
+    API_KEY = "api_key"
+    """ APIキー認証 """

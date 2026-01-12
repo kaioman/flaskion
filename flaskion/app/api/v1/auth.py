@@ -58,6 +58,7 @@ def signin():
     # セッションにidとEmailアドレスをセットする
     session["id"] = user.id
     session["email"] = user.email
+    session.permanent = True
     
     # レスポンス生成
     return SuccessResponse.ok(
@@ -76,15 +77,15 @@ def get_me():
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
     
     # 認証済み
     return SuccessResponse.ok(
         data = {
-            "id": current_user.id,
-            "email": current_user.email
+            "id": auth.user.id,
+            "email": auth.user.email
         },
         status=HTTPStatus.OK
     )

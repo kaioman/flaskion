@@ -15,9 +15,9 @@ def image_edit():
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
     
     # フォームデータ取得
     param_data: dict = request.form.to_dict()
@@ -27,7 +27,7 @@ def image_edit():
     
     # ImageGenServiceで画像編集
     results, status = ImageGenService.edit_image(
-        current_user=current_user,
+        current_user=auth.user,
         param_data=param_data,
         source_image=source_image
     )

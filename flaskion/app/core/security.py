@@ -7,8 +7,11 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 from datetime import datetime, timedelta, timezone
 from app.core.config import settings
 from app.core.errors import UserError
+from app.core.enums import AuthType
 from app.models.user import User
+from app.models.current_user_result import CurrentUserResult
 from app.db.session import db
+from app.services.hash_service import HashService
 
 def hash_password(password: str) -> str:
     """
@@ -131,30 +134,75 @@ def get_current_user():
     - 上記いずれかの場合はNoneを返す
     """
     
+    # 1. セッション認証(HTMLページ用)
+    current_user_id = session.get("id")
+    if current_user_id:
+        user = db.query(User).filter_by(id=current_user_id).first()
+        if user:
+            return CurrentUserResult(
+                user=user,
+                auth_type=AuthType.SESSION,
+                error_code=None,
+                http_status=None
+            )
+    
+    # 2. JWT認証
     # Authorizationヘッダーを取得する
     auth_header = request.headers.get("Authorization")
     # ヘッダーの存在、ヘッダーに"Bearer "を含むか(Bearerは大文字小文字を許容)
-    if not auth_header or not auth_header.lower().startswith("bearer "):
-        return None, UserError.AUTH_HEADER_MISSING, HTTPStatus.UNAUTHORIZED
+    if auth_header and auth_header.lower().startswith("bearer "):
     
-    # アクセストークン取得
-    parts = auth_header.split()
-    if len(parts) != 2:
-        return None, UserError.AUTH_HEADER_MISSING, HTTPStatus.UNAUTHORIZED
-    token = parts[1]
-    try:
-        payload = decode_access_token(token)
-    except Exception as e:
-        print(f"[decode_access_token] Invalid token: {e}")
-        return None, UserError.INVALID_ACCESS_TOKEN, HTTPStatus.UNAUTHORIZED
+        # アクセストークン取得
+        parts = auth_header.split()
+        if len(parts) == 2:            
+            token = parts[1]
+            try:
+                payload = decode_access_token(token)
+                
+                # ユーザーID取得
+                user_id = payload.get("sub")
+                if user_id:
+                    return CurrentUserResult(
+                        user=db.query(User).filter_by(id=user_id).first(),
+                        auth_type=AuthType.JWT,
+                        error_code=None,
+                        http_status=None
+                    )
+            
+            except Exception as e:
+                print(f"[decode_access_token] Invalid token: {e}")
+                return CurrentUserResult(
+                    user=None, 
+                    auth_type=None,
+                    error_code=UserError.INVALID_ACCESS_TOKEN, 
+                    http_status=HTTPStatus.UNAUTHORIZED
+                )
     
-    # ユーザーID取得
-    user_id = payload.get("sub")
-    if not user_id:
-        return None, UserError.USER_NOT_FOUND, HTTPStatus.UNAUTHORIZED
+    # 3. APIキー認証
+    # Authorizationヘッダーを取得する
+    auth_header = request.headers.get("Authorization")
+    # ヘッダーの存在、ヘッダーに"Uwgen "を含むか(Uwgenは大文字小文字を許容)
+    if auth_header and auth_header.lower().startswith("Uwgen "):
+        
+        # APIキー取得
+        api_key = auth_header.split()[1]
+        hashed_api_key = HashService.hash_value(api_key)
+        user = user=db.query(User).filter_by(uwgen_api_key=hashed_api_key).first()
+        if user:
+            return CurrentUserResult(
+                user=user,
+                auth_type=AuthType.API_KEY,
+                error_code=None,
+                http_status=None
+            )
     
-    # ユーザー情報を返す
-    return db.query(User).filter_by(id=user_id).first(), None, None
+    # 認証失敗
+    return CurrentUserResult(
+        user=None, 
+        auth_type=None,
+        error_code=UserError.AUTH_HEADER_MISSING, 
+        http_status=HTTPStatus.UNAUTHORIZED
+    )
 
 def get_user_from_session():
     """

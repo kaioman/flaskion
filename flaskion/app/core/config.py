@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 from dataclasses import dataclass
@@ -39,6 +40,13 @@ class Settings:
 
     # 編集画像ディレクトリ
     EDIT_IMAGE_DIR: str = "edited"
+    
+    # Flaskセッション関連の設定
+    SESSION_PERMANENT = os.getenv("SESSION_PERMANENT", "true").lower() == "true"
+    PERMANENT_SESSION_LIFETIME = timedelta(days=int(os.getenv("PERMANENT_SESSION_LIFETIME_DAYS", 7)))
+    SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
+    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+    SESSION_COOKIE_HTTPONLY = os.getenv("SESSION_COOKIE_HTTPONLY", "true").lower() == "true"
     
 # インスタンス生成
 settings = Settings()

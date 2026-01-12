@@ -18,16 +18,16 @@ def image_gen():
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
     
     # リクエストデータ検証
     param_data: dict = request.get_json() or {}
     
     # ImageGenServiceで画像生成
     results, status = ImageGenService.generate_image(
-        current_user=current_user,
+        current_user=auth.user,
         param_data=param_data
     )
     if status == HTTPStatus.OK:
@@ -45,12 +45,12 @@ def get_image(path_type: str, date_dir: str, image_id: str):
     """
     
     # 認証チェック
-    current_user, error, status = get_current_user()
-    if error:
-        return ErrorResponse.from_error(error, status)
+    auth = get_current_user()
+    if auth.error_code:
+        return ErrorResponse.from_error(auth.error_code, auth.http_status)
 
     # 保存先ディレクトリ取得
-    user_dir = ImageGenService.get_image_path(path_type, date_dir, current_user.id)
+    user_dir = ImageGenService.get_image_path(path_type, date_dir, auth.user.id)
 
     # ユーザーディレクトリチェック
     if not user_dir.exists():

@@ -5,6 +5,7 @@ from app.core.security import generate_api_key_value
 from app.core.errors import UserError
 from app.db.transaction import transactional
 from app.services.encrypt_service import EncryptService
+from app.services.hash_service import HashService
 
 class UserService:
     
@@ -74,8 +75,12 @@ class UserService:
             if key in updatable_fields and value is not None:
                 column = User.__table__.columns.get(key)
                 if column.info.get("encrypt"):
+                    # 暗号化する
                     key_type = column.info.get("key")
                     value = EncryptService.encrypt(value, key_type)
+                if column.info.get("hash"):
+                    # ハッシュ化する
+                    value = HashService.hash_value(value)
                 
                 setattr(user, key, value)
         

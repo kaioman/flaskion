@@ -85,12 +85,12 @@ class User(BaseModel):
         info={"updatable": True}
     )
 
-    # Uwgen APIキー (暗号化)
+    # Uwgen APIキー (ハッシュ化)
     uwgen_api_key = Column(
         String,
         unique=True,
         nullable=True,
-        info={"updatable": True, "encrypt": True, "key": EncryptionKeyType.UWGEN}
+        info={"updatable": True, "hash": True}
     )
     
     # Uwgen APIキーの最終更新日時

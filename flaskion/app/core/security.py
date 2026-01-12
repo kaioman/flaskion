@@ -171,7 +171,7 @@ def get_current_user():
     
         # アクセストークン取得
         parts = auth_header.split()
-        if len(parts) == 2:            
+        if len(parts) == 2:
             token = parts[1]
             try:
                 payload = decode_access_token(token)

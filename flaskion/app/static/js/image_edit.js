@@ -226,7 +226,7 @@ function setupImageEdit() {
             // Httpリクエストコード判定
             if (response.isSuccess()) {
 
-                response.body.data.generated.forEach(async (path) => {
+                response.body.data.generated.filenames.forEach(async (path) => {
                     
                     // カードテンプレート複製
                     const card = template.content.cloneNode(true);

@@ -3,8 +3,11 @@ from flask import Blueprint, request
 from http import HTTPStatus
 from app.services.image_service import ImageGenService
 from app.core.security import get_current_user
+from app.core.enums import AuthType
 from app.models.response.errors import ErrorResponse
 from app.models.response.success import SuccessResponse
+from app.services.image_generation.local_storage import LocalStorageStrategy
+from app.services.image_generation.memory_storage import MemoryStorageStrategy
 
 bp = Blueprint("image_edit_api", __name__, url_prefix="/api/v1")
 
@@ -22,6 +25,12 @@ def image_edit():
     # フォームデータ取得
     param_data: dict = request.form.to_dict()
 
+    # クエリパラメーター判定(リクエスト元が外部APIかWebアプリか判定)
+    if auth.auth_type == AuthType.API_KEY:
+        storage = MemoryStorageStrategy()
+    else:
+        storage = LocalStorageStrategy(current_user_id=auth.user.id)
+    
     # 元画像を取得
     source_image = request.files.get("sourceImage")
     
@@ -29,7 +38,8 @@ def image_edit():
     results, status = ImageGenService.edit_image(
         current_user=auth.user,
         param_data=param_data,
-        source_image=source_image
+        source_image=source_image,
+        storage_strategy=storage
     )
     if status == HTTPStatus.OK:
         return SuccessResponse.ok(

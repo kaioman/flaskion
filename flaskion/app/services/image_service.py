@@ -1,199 +1,152 @@
 import uuid
 import libcore_hng.utils.app_logger as app_logger
+from typing import Type, TypeVar
 from datetime import datetime, timezone
 from http import HTTPStatus
-from flask import url_for
 from pydantic import ValidationError
-from PIL import Image as PIL_image
 from werkzeug.datastructures import FileStorage
-from datetime import date
 from pycorex.gemini_client import GeminiClient
 from pycorex.exceptions.no_candidates_error import NoCandidatesError
 from app.core.config import settings
 from app.core.enums import EncryptionKeyType, ImagePathType
 from app.core.errors import ImageGenError, ImageEditError
+from app.models.image_params_result import ImageParamsResult
 from app.models.image_gen_params import ImageGenParams
 from app.models.image_edit_params import ImageEditParams
+from app.models.base_image_params import BaseImageParams
 from app.models.user import User
 from app.services.encrypt_service import EncryptService
+from app.services.image_generation.core_generate import CoreImageGenerator
+from app.services.image_generation.core_edit import CoreImageEditor
+from app.services.image_generation.base import StorageStrategy
+
+T = TypeVar('T', bound=BaseImageParams)
 
 class ImageGenService:
 
     @staticmethod
-    def generate_image(current_user: User, param_data: dict):
+    def get_params(current_user: User, param_data: dict, param_class: Type[T]):
+        """
+        パラメーター取得/チェック
+        """
         
-        app_logger.info(f"[ImageGenService] Start image generation. user_id={current_user.id}")
-
         try:
             # フォームの入力値をパラメーターモデルクラスに設定する
-            params = ImageGenParams(**param_data)
+            params = param_class(**param_data)
             app_logger.info(f"[ImageGenService] Parameters validated. prompt_length={len(params.prompt)}")
         except ValidationError:
             app_logger.error(f"[ImageGenService] Parameters validation failed. user_id={current_user.id}")
-            return ImageGenError.INVALID_PARAMETER, HTTPStatus.INTERNAL_SERVER_ERROR
-        
+            return ImageParamsResult(
+                params=None,
+                decrypted_api_key=None,
+                error_code=ImageGenError.INVALID_PARAMETER, 
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+
         # プロンプト入力チェック
         if not params.prompt:
             app_logger.warning(f"[ImageGenService] Missing prompt. user_id={current_user.id}")
-            return ImageGenError.MISSING_PROMPT, HTTPStatus.BAD_REQUEST
+            return ImageParamsResult(
+                params=None,
+                decrypted_api_key=None,
+                error_code=ImageGenError.MISSING_PROMPT, 
+                http_status=HTTPStatus.BAD_REQUEST
+            )
         
         # 暗号化されたAPIキーを取得
         ciphertext = current_user.gemini_api_key_vertexai_encrypted
         if not ciphertext:
             app_logger.error(f"[ImageGenService] Missing API key. user_id={current_user.id}")
-            return ImageGenError.MISSING_GEMINI_API_KEY, HTTPStatus.BAD_REQUEST
+            return ImageParamsResult(
+                params=None,
+                decrypted_api_key=None,
+                error_code=ImageGenError.MISSING_GEMINI_API_KEY, 
+                http_status=HTTPStatus.BAD_REQUEST
+            )
         
         # APIキーを復号する
         app_logger.info(f"[ImageGenService] Encrypted API key found. user_id={current_user.id}")
         api_key = ImageGenService.get_api_key(ciphertext)
         app_logger.info(f"[ImageGenService] API key decrypted. user_id={current_user.id}")
-
-        # GeminiClientを初期化
-        client = GeminiClient(
-            api_key=api_key
+        
+        # パラメーターを返す
+        return ImageParamsResult(
+            params=params,
+            decrypted_api_key=api_key,
+            error_code=None, 
+            http_status=None
         )
-        app_logger.info(f"[ImageGenService] GeminiClient initialized.")
+        
+    @staticmethod
+    def generate_image(current_user: User, param_data: dict, storage_strategy: StorageStrategy):
+        """
+        画像生成メソッド
+        """
+        
+        # 開始ログ
+        app_logger.info(f"[ImageGenService] Start image generation. user_id={current_user.id}")
+
+        # パラメーターを取得する
+        params_result = ImageGenService.get_params(current_user, param_data, ImageGenParams)
+        if not params_result.params:
+            return params_result.error_code, params_result.http_status
         
         # 画像生成を実行
         try:
-            app_logger.info(f"[ImageGenService] Generating image... user_id={current_user.id}")
-            response = client.generate_image(
-                prompt=params.prompt,
-                model=params.model,
-                aspect_ratio=params.aspect,
-                image_size=params.resolution,
-                harm_category = params.safety_filter,
-                safety_filter_level = params.safety_level
-            )
-            app_logger.info(f"[ImageGenService] Image generation completed. result_count={len(response['result'])}")
-            
-        except NoCandidatesError as e:
-            app_logger.error(e)
+            generator = CoreImageGenerator(api_key=params_result.decrypted_api_key)
+            image_bytes_list = generator.generate(params_result.params)
+        except NoCandidatesError:
             return ImageGenError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
-        except Exception as e:
-            app_logger.error(e)
+        except Exception:
             return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
-
-        # 日付フォルダ名取得
-        date_dir = date.today().isoformat()
-
-        # 出力先パス取得・作成
-        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.GENERATED.value, date_dir, current_user.id)
-        MEDIA_DIR.mkdir(parents=True, exist_ok=True)
-        app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
         
-        # 画像ファイルを出力する
-        results: list[str] = []
-        for _, image_bytes in enumerate(response["result"]):
-            filename = ImageGenService.get_gen_filename()
-            output_path = MEDIA_DIR / filename
-            with open(output_path, "wb") as f:
-                f.write(image_bytes)
-            results.append(filename)
-            app_logger.info(f"[ImageGenService] Saved image: {filename}")
+        # 生成結果を保存/取得
+        save_result = storage_strategy.save(image_bytes_list, ImagePathType.GENERATED)
+        app_logger.info(f"[ImageGenService] save_result generated. count={len(save_result)}")
 
-        # public URLに変換してリスト化する
-        public_urls = [
-            url_for("image_gen_api.get_image", path_type=ImagePathType.GENERATED.value, date_dir=date_dir, image_id=image_id, _external=True)
-            for image_id in results
-        ]
-        app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
-        
-        # 生成した画像のパスを返す
+        # 終了ログ
         app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
-        return public_urls, HTTPStatus.OK
+
+        # 生成した画像のパスを返す
+        return save_result, HTTPStatus.OK
     
     @staticmethod
-    def edit_image(current_user: User, param_data: dict, source_image: FileStorage):
+    def edit_image(current_user: User, param_data: dict, source_image: FileStorage, storage_strategy: StorageStrategy):
+        """
+        画像編集メソッド
+        """
         
+        # 開始ログ
         app_logger.info(f"[ImageGenService] Start image edit. user_id={current_user.id}")
 
-        try:
-            # フォームの入力値をパラメーターモデルクラスに設定する
-            params = ImageEditParams(**param_data)
-            app_logger.info(f"[ImageGenService] Parameters validated. prompt_length={len(params.prompt)}")
-        except ValidationError:
-            app_logger.error(f"[ImageGenService] Parameters validation failed. user_id={current_user.id}")
-            return ImageGenError.INVALID_PARAMETER, HTTPStatus.INTERNAL_SERVER_ERROR
-        
-        # プロンプト入力チェック
-        if not params.prompt:
-            app_logger.warning(f"[ImageGenService] Missing prompt. user_id={current_user.id}")
-            return ImageGenError.MISSING_PROMPT, HTTPStatus.BAD_REQUEST
-        
+        # パラメーターを取得する
+        params_result = ImageGenService.get_params(current_user, param_data, ImageEditParams)
+        if not params_result.params:
+            return params_result.error_code, params_result.http_status
+
         # 元画像入力チェック
         if not source_image:
             app_logger.warning(f"[ImageGenService] Missing source image file. user_id={current_user.id}")
             return ImageEditError.MISSING_SOURCE_IMAGE_NOT_FOUND, HTTPStatus.BAD_REQUEST
         
-        # 暗号化されたAPIキーを取得
-        ciphertext = current_user.gemini_api_key_vertexai_encrypted
-        if not ciphertext:
-            app_logger.error(f"[ImageGenService] Missing API key. user_id={current_user.id}")
-            return ImageGenError.MISSING_GEMINI_API_KEY, HTTPStatus.BAD_REQUEST
-        
-        # APIキーを復号する
-        app_logger.info(f"[ImageGenService] Encrypted API key found. user_id={current_user.id}")
-        api_key = ImageGenService.get_api_key(ciphertext)
-        app_logger.info(f"[ImageGenService] API key decrypted. user_id={current_user.id}")
-
-        # 元画像のバイナリデータを取得する
-        base_image = PIL_image.open(source_image.stream)
-        
-        # GeminiClientを初期化
-        client = GeminiClient(
-            api_key=api_key
-        )
-        app_logger.info(f"[ImageGenService] GeminiClient initialized.")
-        
         # 画像編集を実行
         try:
-            app_logger.info(f"[ImageGenService] Editing image... user_id={current_user.id}")
-            response = client.edit_image(
-                prompt=params.prompt,
-                model=params.model,
-                base_image=base_image,
-                aspect_ratio=params.aspect,
-                image_size=params.resolution,
-                harm_category = params.safety_filter,
-                safety_filter_level = params.safety_level
-            )
-            app_logger.info(f"[ImageGenService] Image edit completed. result_count={len(response['result'])}")
-            
-        except NoCandidatesError as e:
-            app_logger.error(e)
+            editor = CoreImageEditor(api_key=params_result.decrypted_api_key)
+            image_bytes_list = editor.edit(params_result.params, source_image.stream)
+        except NoCandidatesError:
             return ImageGenError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
-        except Exception as e:
-            app_logger.error(e)
+        except Exception:
             return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
         
-        # 日付フォルダ名取得
-        date_dir = date.today().isoformat()
-        # 出力先パス取得・作成
-        MEDIA_DIR = ImageGenService.get_image_path(ImagePathType.EDITED.value, date_dir, current_user.id)
-        MEDIA_DIR.mkdir(parents=True, exist_ok=True)
-        app_logger.info(f"[ImageGenService] Output directory prepared: {MEDIA_DIR}")
+        # 生成結果を保存/取得
+        save_result = storage_strategy.save(image_bytes_list, ImagePathType.EDITED)
+        app_logger.info(f"[ImageGenService] save_result generated. count={len(save_result)}")
         
-        # 画像ファイルを出力する
-        results: list[str] = []
-        for _, image_bytes in enumerate(response["result"]):
-            filename = ImageGenService.get_gen_filename()
-            output_path = MEDIA_DIR / filename
-            with open(output_path, "wb") as f:
-                f.write(image_bytes)
-            results.append(filename)
-            app_logger.info(f"[ImageGenService] Saved image: {filename}")
-
-        # public URLに変換してリスト化する
-        public_urls = [
-            url_for("image_gen_api.get_image", path_type=ImagePathType.EDITED.value, date_dir=date_dir, image_id=image_id, _external=True)
-            for image_id in results
-        ]
-        app_logger.info(f"[ImageGenService] Public URLs generated. count={len(public_urls)}")
-        
-        # 生成した画像のパスを返す
+        # 終了ログ
         app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
-        return public_urls, HTTPStatus.OK
+
+        # 生成した画像のパスを返す
+        return save_result, HTTPStatus.OK
     
     @staticmethod
     def get_gen_filename():
@@ -207,10 +160,17 @@ class ImageGenService:
 
     @staticmethod
     def get_root_image_path(current_user_id):
+        """
+        画像格納先ルートパスを取得する
+        """
+        
         return settings.MEDIA_ROOT / str(current_user_id)
     
     @staticmethod
     def get_image_path(path_type: str, date_str: str, current_user_id):
+        """
+        画像格納先パスを取得する
+        """
 
         # ルートパス
         root_path = ImageGenService.get_root_image_path(current_user_id)

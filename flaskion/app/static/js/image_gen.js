@@ -109,7 +109,7 @@ function setupImageGenerateion() {
 
         // 入力値を回収
         const payload = Object.fromEntries(new FormData(form));
-
+        
         try {
             // サーバーにPOSTリクエストを送信して結果を受け取る
             const response = await HttpClient.post("/api/v1/image_gen", payload);
@@ -119,8 +119,8 @@ function setupImageGenerateion() {
 
             // Httpリクエストコード判定
             if (response.isSuccess()) {
-
-                response.body.data.generated.forEach(async (path) => {
+                
+                response.body.data.generated.filenames.forEach(async (path) => {
                     
                     // カードテンプレート複製
                     const card = template.content.cloneNode(true);

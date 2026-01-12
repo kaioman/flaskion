@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request
+from datetime import datetime
 from typing import Any, Optional
 from pycorex.gemini_client import GeminiClient
 from app.services.image_service import ImageGenService
@@ -39,7 +40,7 @@ def settings():
 
     # uwgen APIキーをマスクする
     if user.uwgen_api_key:
-        masked_uwgen_api_key = mask_api_key(user.uwgen_api_key)
+        masked_uwgen_api_key = f"[発行済] 最終発行日:{datetime.strftime(user.uwgen_api_key_updated_at,'%Y/%m/%d %H:%M:%S')}"
     else:
         masked_uwgen_api_key = "[未発行]"
     

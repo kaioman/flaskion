@@ -95,6 +95,23 @@ def generate_api_key_value() -> str:
     """
     return secrets.token_urlsafe(32)
 
+def generate_api_key_hash(api_key) -> str:
+    """
+    APIキーをハッシュ化する
+    
+    Parameters
+    ----------
+
+    api_key : str
+        ハッシュ化するAPIキー
+
+    Returns
+    -------
+    str
+        ハッシュ化されたAPIキー
+    """
+    return HashService.hash_value(api_key)
+
 def decode_access_token(token: str):
     """
     JWTアクセストークンをデコードしてpayloadを返す

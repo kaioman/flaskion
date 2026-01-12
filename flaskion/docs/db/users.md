@@ -157,6 +157,55 @@ During updates, the service layer reads this metadata and selects the appropriat
   
 ---
 
+## Hash Metadata (`hash`)
+
+Some user fields, such as API keys intended for external clients, must never be stored in plaintext
+or in a reversible encrypted form.
+To support this securely, Uwgen provides a `hash` metadata flag that instructs the service layer to
+apply **one-way hashing** before persisting the value.
+
+### `hash: True`
+
+When present, this flag indicates that the field must be hashed before being stored in the database.
+
+Unlike encrypted fields:
+
+- Hashed values **cannot be reversed**
+- The original plaintext value is **never recoverable**
+- Verification is performed by hashing the incoming value and comparing it to the stored hash
+
+This behavior is appropriate for API keys that the application does not need to decrypt, such as
+Uwgen's user-facing API keys.
+
+### Example
+
+```Python
+uwgen_api_key = Column(
+    String,
+    unique=True,
+    nullable=True,
+    info={"updatable": True, "hash": True}
+)
+```
+
+During updates, the service layer checks this metadata:
+
+- If `hash=True`, the incoming plaintext value is passed through the `HashService` (e.g.,SHA-256)
+- The resulting hash is stored in the database
+- The original value is shown to the user only **at creation time**, since it cannot be reconstructed later
+
+### Benefits of Hashing
+
+- **Irreversible Storage**
+  Even if the database is compromised, hashed API keys cannot be recovered.
+- **Correct Semantics for API Keys**
+  User-facing API keys do not need to be decrypted by the application; hashing enforces this contract.
+- **Model-Level Declaration**
+  The model explicitly defines which fields require hashing, keeping the logic centralized and consistent.
+- **Safe Extensibility**
+  Adding a new hashed field requires only updating the model definition;
+  the service layer automatically applies the correct behavior.
+
 ## Lifecycle Events
 
 - **Account creation** sets `created_at` and `updated_at`.

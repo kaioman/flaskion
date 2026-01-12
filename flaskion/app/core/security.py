@@ -199,7 +199,7 @@ def get_current_user():
     # Authorizationヘッダーを取得する
     auth_header = request.headers.get("Authorization")
     # ヘッダーの存在、ヘッダーに"Uwgen "を含むか(Uwgenは大文字小文字を許容)
-    if auth_header and auth_header.lower().startswith("Uwgen "):
+    if auth_header and auth_header.lower().startswith("uwgen "):
         
         # APIキー取得
         api_key = auth_header.split()[1]

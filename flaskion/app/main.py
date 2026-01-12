@@ -33,6 +33,10 @@ def load_user():
     g.current_user = auth.user
     g.auth_type = auth.auth_type
     
+    # AuthTypeがNoneの場合は終了
+    if not auth.auth_type:
+        return
+    
     # APIはセッション不要
     if auth.auth_type == AuthType.API_KEY:
         return

@@ -10,10 +10,10 @@ from pycorex.exceptions.no_candidates_error import NoCandidatesError
 from app.core.config import settings
 from app.core.enums import EncryptionKeyType, ImagePathType
 from app.core.errors import ImageGenError, ImageEditError, ImageAnalyzeError
-from app.models.params_result import ParamsResult
 from app.models.image_gen_params import ImageGenParams
 from app.models.image_edit_params import ImageEditParams
 from app.models.image_analyze_params import ImageAnalyzeParams
+from app.models.service_result import ParamsResult, AIServiceResult
 from app.models.base_params import BaseParams
 from app.models.base_image_params import BaseImageParams
 from app.models.user import User
@@ -168,12 +168,20 @@ class ImageGenService:
         # パラメーターを取得する
         params_result = ImageGenService.get_params(current_user, param_data, ImageAnalyzeParams)
         if not params_result.params:
-            return None, params_result.error_code, params_result.http_status
+            return AIServiceResult(
+                result=None, 
+                error_code=params_result.error_code,
+                http_status=params_result.http_status
+            )
 
         # 解析画像入力チェック
         if not source_image:
             app_logger.warning(f"[ImageGenService] Missing source image file. user_id={current_user.id}")
-            return None, ImageAnalyzeError.MISSING_SOURCE_IMAGE_NOT_FOUND, HTTPStatus.BAD_REQUEST
+            return AIServiceResult(
+                result=None, 
+                error_code=ImageAnalyzeError.MISSING_SOURCE_IMAGE_NOT_FOUND, 
+                http_status=HTTPStatus.BAD_REQUEST
+            )
         
         # 画像解析を実行
         try:
@@ -181,13 +189,21 @@ class ImageGenService:
             analyzer = CoreImageAnalyzer(api_key=params_result.decrypted_api_key)
             response = analyzer.analyze(params_result.params, raw_bytes)
         except Exception:
-            return None, ImageAnalyzeError.ANALYZE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
+            return AIServiceResult(
+                result=None, 
+                error_code=ImageAnalyzeError.ANALYZE_INTERNAL_ERROR, 
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
         
         # 終了ログ
         app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
 
         # 画像解析リクエストのレスポンスを返す
-        return response, None, HTTPStatus.OK
+        return AIServiceResult(
+            result=response, 
+            error_code=None, 
+            http_status=HTTPStatus.OK
+        )
     
     @staticmethod
     def get_gen_filename():

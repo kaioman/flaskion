@@ -25,18 +25,18 @@ def image_analyze():
     source_image = request.files.get("sourceImage")
 
     # ImageGenServiceで画像解析
-    results, error_code, status = ImageGenService.analyze_image(
+    response = ImageGenService.analyze_image(
         current_user=auth.user,
         param_data=param_data,
         source_image=source_image
     )
-    if status == HTTPStatus.OK:
+    if response.http_status == HTTPStatus.OK:
         return SuccessResponse.ok(
             data={
-                "generated": results["result"],
-                "response_detail": results
+                "generated": response.result,
+                "response_detail": response
             },
-            status=status
+            status=response.http_status
         )
     else:
-        return ErrorResponse.from_error(error_code, status)
+        return ErrorResponse.from_error(response.error_code, response.http_status)

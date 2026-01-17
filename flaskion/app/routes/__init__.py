@@ -30,3 +30,7 @@ def register_routes(app:Flask):
     # galleryルート
     from app.api.v1.gallery import bp as image_gallery_bp
     app.register_blueprint(image_gallery_bp)
+
+    # image_analyzeルート
+    from app.api.v1.image_analyze import bp as image_analyze_bp
+    app.register_blueprint(image_analyze_bp)

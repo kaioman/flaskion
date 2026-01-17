@@ -1,17 +1,11 @@
-from libcore_hng.core.base_api_model import BaseApiModel
 from typing import Optional
 from pycorex.gemini_client import GeminiClient
+from app.models.base_params import BaseParams
 
-class BaseImageParams(BaseApiModel):
+class BaseImageParams(BaseParams):
     """
     画像生成/編集パラメーターモデル基底
     """
-    
-    prompt: str
-    """ プロンプト """
-    
-    model: Optional[GeminiClient.GeminiModel] = None
-    """ モデル """
     
     resolution: Optional[GeminiClient.ImageSize] = None
     """ 解像度 """

@@ -1,6 +1,3 @@
-#from libcore_hng.core.base_api_model import BaseApiModel
-#from typing import Optional
-#from pycorex.gemini_client import GeminiClient
 from app.models.base_image_params import BaseImageParams
 
 class ImageGenParams(BaseImageParams):

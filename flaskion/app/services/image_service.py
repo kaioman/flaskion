@@ -9,18 +9,21 @@ from pycorex.gemini_client import GeminiClient
 from pycorex.exceptions.no_candidates_error import NoCandidatesError
 from app.core.config import settings
 from app.core.enums import EncryptionKeyType, ImagePathType
-from app.core.errors import ImageGenError, ImageEditError
-from app.models.image_params_result import ImageParamsResult
+from app.core.errors import ImageGenError, ImageEditError, ImageAnalyzeError
+from app.models.params_result import ParamsResult
 from app.models.image_gen_params import ImageGenParams
 from app.models.image_edit_params import ImageEditParams
+from app.models.image_analyze_params import ImageAnalyzeParams
+from app.models.base_params import BaseParams
 from app.models.base_image_params import BaseImageParams
 from app.models.user import User
 from app.services.encrypt_service import EncryptService
 from app.services.image_generation.core_generate import CoreImageGenerator
 from app.services.image_generation.core_edit import CoreImageEditor
+from app.services.image_generation.core_analyze import CoreImageAnalyzer
 from app.services.image_generation.base import StorageStrategy
 
-T = TypeVar('T', bound=BaseImageParams)
+T = TypeVar('T', bound=BaseParams)
 
 class ImageGenService:
 
@@ -36,7 +39,7 @@ class ImageGenService:
             app_logger.info(f"[ImageGenService] Parameters validated. prompt_length={len(params.prompt)}")
         except ValidationError:
             app_logger.error(f"[ImageGenService] Parameters validation failed. user_id={current_user.id}")
-            return ImageParamsResult(
+            return ParamsResult(
                 params=None,
                 decrypted_api_key=None,
                 error_code=ImageGenError.INVALID_PARAMETER, 
@@ -46,7 +49,7 @@ class ImageGenService:
         # プロンプト入力チェック
         if not params.prompt:
             app_logger.warning(f"[ImageGenService] Missing prompt. user_id={current_user.id}")
-            return ImageParamsResult(
+            return ParamsResult(
                 params=None,
                 decrypted_api_key=None,
                 error_code=ImageGenError.MISSING_PROMPT, 
@@ -54,10 +57,15 @@ class ImageGenService:
             )
         
         # 暗号化されたAPIキーを取得
-        ciphertext = current_user.gemini_api_key_vertexai_encrypted
+        ciphertext = ""
+        if isinstance(params, BaseImageParams):
+            ciphertext = current_user.gemini_api_key_vertexai_encrypted
+        else:
+            ciphertext = current_user.gemini_api_key_encrypted
+        
         if not ciphertext:
             app_logger.error(f"[ImageGenService] Missing API key. user_id={current_user.id}")
-            return ImageParamsResult(
+            return ParamsResult(
                 params=None,
                 decrypted_api_key=None,
                 error_code=ImageGenError.MISSING_GEMINI_API_KEY, 
@@ -70,7 +78,7 @@ class ImageGenService:
         app_logger.info(f"[ImageGenService] API key decrypted. user_id={current_user.id}")
         
         # パラメーターを返す
-        return ImageParamsResult(
+        return ParamsResult(
             params=params,
             decrypted_api_key=api_key,
             error_code=None, 
@@ -134,9 +142,9 @@ class ImageGenService:
             editor = CoreImageEditor(api_key=params_result.decrypted_api_key)
             image_bytes_list = editor.edit(params_result.params, source_image.stream)
         except NoCandidatesError:
-            return ImageGenError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
+            return ImageEditError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
         except Exception:
-            return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
+            return ImageEditError.EDIT_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
         
         # 生成結果を保存/取得
         save_result = storage_strategy.save(image_bytes_list, ImagePathType.EDITED)
@@ -147,6 +155,39 @@ class ImageGenService:
 
         # 生成した画像のパスを返す
         return save_result, HTTPStatus.OK
+    
+    @staticmethod
+    def analyze_image(current_user: User, param_data: dict, source_image: FileStorage | bytes):
+        """
+        画像解析メソッド
+        """
+        
+        # 開始ログ
+        app_logger.info(f"[ImageGenService] Start image analyze. user_id={current_user.id}")
+
+        # パラメーターを取得する
+        params_result = ImageGenService.get_params(current_user, param_data, ImageAnalyzeParams)
+        if not params_result.params:
+            return None, params_result.error_code, params_result.http_status
+
+        # 解析画像入力チェック
+        if not source_image:
+            app_logger.warning(f"[ImageGenService] Missing source image file. user_id={current_user.id}")
+            return None, ImageAnalyzeError.MISSING_SOURCE_IMAGE_NOT_FOUND, HTTPStatus.BAD_REQUEST
+        
+        # 画像解析を実行
+        try:
+            raw_bytes = source_image if isinstance(source_image, bytes) else source_image.stream.read()
+            analyzer = CoreImageAnalyzer(api_key=params_result.decrypted_api_key)
+            response = analyzer.analyze(params_result.params, raw_bytes)
+        except Exception:
+            return None, ImageAnalyzeError.ANALYZE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
+        
+        # 終了ログ
+        app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
+
+        # 画像解析リクエストのレスポンスを返す
+        return response, None, HTTPStatus.OK
     
     @staticmethod
     def get_gen_filename():

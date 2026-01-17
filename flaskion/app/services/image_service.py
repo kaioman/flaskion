@@ -97,26 +97,46 @@ class ImageGenService:
         # パラメーターを取得する
         params_result = ImageGenService.get_params(current_user, param_data, ImageGenParams)
         if not params_result.params:
-            return params_result.error_code, params_result.http_status
+            return AIServiceResult(
+                result=None,
+                error_code=params_result.error_code, 
+                http_status=params_result.http_status
+            )
         
         # 画像生成を実行
         try:
             generator = CoreImageGenerator(api_key=params_result.decrypted_api_key)
-            image_bytes_list = generator.generate(params_result.params)
+            response = generator.generate(params_result.params)
         except NoCandidatesError:
-            return ImageGenError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
-        except Exception:
-            return ImageGenError.IMAGE_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
-        
+            return AIServiceResult(
+                result=None,
+                error_code=ImageGenError.IMAGE_NO_CANDIDATES, 
+                http_status=HTTPStatus.BAD_REQUEST
+            )
+
+        except Exception as e:
+            # エラーログ出力
+            app_logger.error(e)
+            
+            return AIServiceResult(
+                result=None,
+                error_code=ImageGenError.IMAGE_INTERNAL_ERROR, 
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+
         # 生成結果を保存/取得
-        save_result = storage_strategy.save(image_bytes_list, ImagePathType.GENERATED)
-        app_logger.info(f"[ImageGenService] save_result generated. count={len(save_result)}")
+        response["save_result"] = storage_strategy.save(response["result"], ImagePathType.GENERATED)
+        app_logger.info(f"[ImageGenService] save_result generated. count={len(response['save_result'])}")
 
         # 終了ログ
         app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
 
         # 生成した画像のパスを返す
-        return save_result, HTTPStatus.OK
+        return AIServiceResult(
+            result=response,
+            error_code=None, 
+            http_status=HTTPStatus.OK
+        )
     
     @staticmethod
     def edit_image(current_user: User, param_data: dict, source_image: FileStorage, storage_strategy: StorageStrategy):
@@ -130,31 +150,54 @@ class ImageGenService:
         # パラメーターを取得する
         params_result = ImageGenService.get_params(current_user, param_data, ImageEditParams)
         if not params_result.params:
-            return params_result.error_code, params_result.http_status
-
+            return AIServiceResult(
+                result=None,
+                error_code=params_result.error_code, 
+                http_status=params_result.http_status
+            )
+            
         # 元画像入力チェック
         if not source_image:
             app_logger.warning(f"[ImageGenService] Missing source image file. user_id={current_user.id}")
-            return ImageEditError.MISSING_SOURCE_IMAGE_NOT_FOUND, HTTPStatus.BAD_REQUEST
+            return AIServiceResult(
+                result=None,
+                error_code=ImageEditError.MISSING_SOURCE_IMAGE_NOT_FOUND, 
+                http_status=HTTPStatus.BAD_REQUEST
+            )
         
         # 画像編集を実行
         try:
             editor = CoreImageEditor(api_key=params_result.decrypted_api_key)
-            image_bytes_list = editor.edit(params_result.params, source_image.stream)
+            response = editor.edit(params_result.params, source_image.stream)
         except NoCandidatesError:
-            return ImageEditError.IMAGE_NO_CANDIDATES, HTTPStatus.BAD_REQUEST
-        except Exception:
-            return ImageEditError.EDIT_INTERNAL_ERROR, HTTPStatus.INTERNAL_SERVER_ERROR
+            return AIServiceResult(
+                result=None,
+                error_code=ImageEditError.IMAGE_NO_CANDIDATES, 
+                http_status=HTTPStatus.BAD_REQUEST
+            )
+        except Exception as e:
+            # エラーログ出力
+            app_logger.error(e)
+            
+            return AIServiceResult(
+                result=None,
+                error_code=ImageEditError.EDIT_INTERNAL_ERROR, 
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
         
         # 生成結果を保存/取得
-        save_result = storage_strategy.save(image_bytes_list, ImagePathType.EDITED)
-        app_logger.info(f"[ImageGenService] save_result generated. count={len(save_result)}")
+        response["save_result"] = storage_strategy.save(response["result"], ImagePathType.EDITED)
+        app_logger.info(f"[ImageGenService] save_result generated. count={len(response['save_result'])}")
         
         # 終了ログ
         app_logger.info(f"[ImageGenService] Completed successfully. user_id={current_user.id}")
 
         # 生成した画像のパスを返す
-        return save_result, HTTPStatus.OK
+        return AIServiceResult(
+            result=response,
+            error_code=None, 
+            http_status=HTTPStatus.OK
+        )
     
     @staticmethod
     def analyze_image(current_user: User, param_data: dict, source_image: FileStorage | bytes):

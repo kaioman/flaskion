@@ -108,3 +108,19 @@ class ImageEditError(Enum):
     MISSING_SOURCE_IMAGE_NOT_FOUND = "missing_source_image_not_found"
     """ 元画像ファイルが指定されていない """
     
+    IMAGE_NO_CANDIDATES = "image_no_candidates"
+    """ 画像を編集できませんでした。プロンプトを変えて再度実行してください """
+    
+    EDIT_INTERNAL_ERROR = "edit_internal_error"
+    """ 画像編集中に予期しないエラーが発生しました。時間をおいて再度実行してください """
+
+class ImageAnalyzeError(Enum):
+    """
+    画像解析処理で発生するエラーコード一覧
+    """
+    
+    MISSING_SOURCE_IMAGE_NOT_FOUND = "missing_source_image_not_found"
+    """ 解析画像ファイルが指定されていない """
+    
+    ANALYZE_INTERNAL_ERROR = "analyze_internal_error"
+    """ 画像解析中に予期しないエラーが発生しました。時間をおいて再度実行してください """

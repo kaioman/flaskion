@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Optional
-from app.models.base_image_params import BaseImageParams
+from app.models.base_params import BaseParams
 
 @dataclass
-class ImageParamsResult:
+class BaseParamsResult:
     
-    params: Optional[BaseImageParams]
-    """ 画像生成/編集パラメーターモデル """
-    
+    params: Optional[BaseParams]
+    """ パラメーターモデル """
+
     decrypted_api_key: Optional[str]
     """ 復号したAPIキー """
     

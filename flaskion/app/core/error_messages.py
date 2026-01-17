@@ -1,4 +1,4 @@
-from .errors import AuthError, RequestError, UserError, ImageGenError, ImageEditError
+from .errors import AuthError, RequestError, UserError, ImageGenError, ImageEditError, ImageAnalyzeError
 
 AUTH_ERROR_MESSAGES = {
     AuthError.EMAIL_EXISTS: "入力されたEmailアドレスは既に登録されています",
@@ -35,8 +35,16 @@ IMAGE_GEN_ERROR_MESSAGE = {
 
 IMAGE_EDIT_ERROR_MESSAGE = {
     ImageEditError.MISSING_SOURCE_IMAGE_NOT_FOUND: "元画像ファイルが指定されていません",
+    ImageEditError.IMAGE_NO_CANDIDATES: "画像を編集できませんでした。プロンプトを変えて再度実行してください",
+    ImageEditError.EDIT_INTERNAL_ERROR: "画像編集中に予期しないエラーが発生しました。時間をおいて再度実行してください",
 }
 """ 画像編集処理系エラーメッセージ """
+
+IMAGE_ANALYZE_ERROR_MESSAGE = {
+    ImageAnalyzeError.MISSING_SOURCE_IMAGE_NOT_FOUND: "解析画像ファイルが指定されていません",
+    ImageAnalyzeError.ANALYZE_INTERNAL_ERROR: "画像解析中に予期しないエラーが発生しました。時間をおいて再度実行してください",
+}
+""" 画像解析処理系エラーメッセージ """
 
 def get_error_message(err) -> str:
     """
@@ -67,11 +75,15 @@ def get_error_message(err) -> str:
 
     # ImageGenErrorの場合
     if isinstance(err, ImageGenError):
-        return IMAGE_GEN_ERROR_MESSAGE.get(err, "Unknown user error")
+        return IMAGE_GEN_ERROR_MESSAGE.get(err, "Unknown image generate error")
 
     # ImageEditErrorの場合
     if isinstance(err, ImageEditError):
-        return IMAGE_EDIT_ERROR_MESSAGE.get(err, "Unknown user error")
+        return IMAGE_EDIT_ERROR_MESSAGE.get(err, "Unknown image edit error")
+
+    # ImageAmalyzeErrorの場合
+    if isinstance(err, ImageAnalyzeError):
+        return IMAGE_ANALYZE_ERROR_MESSAGE.get(err, "Unknown image analyze error")
     
     # その他エラー
     return "Unknown error"

@@ -35,16 +35,16 @@ def image_edit():
     source_image = request.files.get("sourceImage")
     
     # ImageGenServiceで画像編集
-    results, status = ImageGenService.edit_image(
+    response = ImageGenService.edit_image(
         current_user=auth.user,
         param_data=param_data,
         source_image=source_image,
         storage_strategy=storage
     )
-    if status == HTTPStatus.OK:
+    if response.http_status == HTTPStatus.OK:
         return SuccessResponse.ok(
-            data={"generated": results},
-            status=status
+            data={"generated": response.result["save_result"]},
+            status=response.http_status
         )
     else:
-        return ErrorResponse.from_error(results, status)
+        return ErrorResponse.from_error(response.error_code, response.http_status)

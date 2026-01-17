@@ -33,18 +33,18 @@ def image_gen():
         storage = LocalStorageStrategy(current_user_id=auth.user.id)
     
     # ImageGenServiceで画像生成
-    results, status = ImageGenService.generate_image(
+    response = ImageGenService.generate_image(
         current_user=auth.user,
         param_data=param_data,
         storage_strategy=storage
     )
-    if status == HTTPStatus.OK:
+    if response.http_status == HTTPStatus.OK:
         return SuccessResponse.ok(
-            data={"generated": results},
-            status=status
+            data={"generated": response.result["save_result"]},
+            status=response.http_status
         )
     else:
-        return ErrorResponse.from_error(results, status)
+        return ErrorResponse.from_error(response.error_code, response.http_status)
 
 @bp.get("/images/<path_type>/<date_dir>/<image_id>")
 def get_image(path_type: str, date_dir: str, image_id: str):

@@ -47,7 +47,7 @@ class CoreImageGenerator:
                 safety_filter_level = params.safety_level
             )
             app_logger.info(f"[CoreImageGenerator] Image generation completed. result_count={len(response['result'])}")
-            return response["result"]
+            return response
         
         except NoCandidatesError as e:
             app_logger.error(e)

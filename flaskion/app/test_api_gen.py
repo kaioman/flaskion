@@ -15,13 +15,19 @@ headers = {
 #    "model": "",
 #    "raw": False
 #}
+# payload = {
+#     "prompt":"キャミソール姿の20代OL。少し酒に酔っている",
+#     "model": GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW.value,
+#     "resolution": GeminiClient.ImageSize.TWO_K.value,
+#     "aspect": GeminiClient.AspectRatio.SQUARE.value,
+#     "safety_filter": GeminiClient.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT.value,
+#     "safety_level": GeminiClient.SafetyFilterLevel.BLOCK_ONLY_HIGH.value
+# }
 payload = {
     "prompt":"キャミソール姿の20代OL。少し酒に酔っている",
     "model": GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW.value,
     "resolution": GeminiClient.ImageSize.TWO_K.value,
-    "aspect": GeminiClient.AspectRatio.SQUARE.value,
-    "safety_filter": GeminiClient.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT.value,
-    "safety_level": GeminiClient.SafetyFilterLevel.BLOCK_ONLY_HIGH.value
+    "aspect": GeminiClient.AspectRatio.SQUARE.value
 }
 
 res = requests.post(ENDPOINT, json=payload, headers=headers)

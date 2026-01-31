@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from flask import Flask, redirect, g
+from flask import Flask, redirect, g, request
 from flask_socketio import SocketIO
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
@@ -23,12 +23,28 @@ app.config["SECRET_KEY"] = settings.SECRET_KEY
 # ロガーを初期化する
 init_logging()
 
+# 認証不要ルート定義
+NON_AUTH_ROUTES = {
+    "/signin", 
+    "/signup", 
+    "/api/v1/auth/signin",
+    "/api/v1/auth/me",
+    "/api/v1/auth/signup",
+    "/api/v1/auth/signout",
+    "/favicon.ico"
+}
+
 @app.before_request
 def load_user():
     """
     リクエストごとにユーザーをロードする
     """
+
+    # 認証不要ページはスキップする
+    if request.path in NON_AUTH_ROUTES or request.path.startswith("/static"):
+        return
     
+    # カレントユーザー取得
     auth = get_current_user()
     g.current_user = auth.user
     g.auth_type = auth.auth_type

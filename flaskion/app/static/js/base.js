@@ -74,7 +74,7 @@ async function setupAuthState() {
 
     try {
         // サーバーにカレントユーザー情報を問い合わせる
-        const res = await HttpClient.get("/api/v1/auth/me", { auth: true });
+        const res = await HttpClient.get("/api/v1/auth/me", { auth: false });
         
         if (res.isSuccess()) {
             // ログイン状態
@@ -101,7 +101,10 @@ async function setupAuthState() {
 /**
  * ログアウト処理(JWTを解除する)
  */
-window.logout = function() {
-    localStorage.removeItem("access_token");
-    window.location.href = "/signin";
+window.logout = async function() {
+    const res = await HttpClient.post("/api/v1/auth/signout", {}, { auth: false });
+    if (res.isSuccess()) {
+        localStorage.removeItem("access_token");
+        window.location.href = "/signin";
+    }
 }

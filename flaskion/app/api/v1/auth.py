@@ -89,3 +89,14 @@ def get_me():
         },
         status=HTTPStatus.OK
     )
+
+@bp.post("/signout")
+def signout():
+    """
+    ユーザーサインアウトAPI
+    """
+    
+    session.clear()
+    return SuccessResponse.ok(
+        SigninResponseSchema().dump({})
+    )

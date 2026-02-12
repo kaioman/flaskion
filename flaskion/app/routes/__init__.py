@@ -19,6 +19,10 @@ def register_routes(app:Flask):
     from app.api.v1.settings import bp as settings_bp
     app.register_blueprint(settings_bp)
 
+    # text_genルート
+    from app.api.v1.text_gen import bp as text_gen_bp
+    app.register_blueprint(text_gen_bp)
+
     # image_genルート
     from app.api.v1.image_gen import bp as image_gen_bp
     app.register_blueprint(image_gen_bp)

@@ -124,3 +124,20 @@ class ImageAnalyzeError(Enum):
     
     ANALYZE_INTERNAL_ERROR = "analyze_internal_error"
     """ 画像解析中に予期しないエラーが発生しました。時間をおいて再度実行してください """
+
+class TextGenError(Enum):
+    """
+    テキスト生成処理で発生するエラーコード一覧
+    """
+    
+    MISSING_PROMPT = "missing_prompt"
+    """ プロンプトが指定されていない """
+    
+    INVALID_PARAMETER = "invalid_parameter"
+    """ パラメーター不正 """
+    
+    MISSING_GEMINI_API_KEY = "missing_gemini_api_key"
+    """ GeminiAPIキーが未設定 """
+
+    TEXT_GEN_INTERNAL_ERROR = "text_gen_internal_error"
+    """ テキスト生成中に予期しないエラーが発生しました。時間をおいて再度実行してください """

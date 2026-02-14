@@ -9,7 +9,7 @@ class CoreImageEditor:
     画像編集のコア処理を担当する
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, project_id, location):
         """
         コンストラクタ
         
@@ -17,9 +17,13 @@ class CoreImageEditor:
         ----------
         api_key : str
             外部生成モデルにアクセスするためのAPIキー
+        project_id : str
+            プロジェクトID(Vertexai)
+        location : str
+            ロケーション(Vertexai)
         """
         # GeminiClientを初期化
-        self.client = GeminiClient(api_key=api_key)
+        self.client = GeminiClient(api_key=api_key, project_id=project_id, location=location)
         app_logger.info(f"[CoreImageEditor] GeminiClient initialized.")
         
     def edit(self, params: ImageEditParams, stream):

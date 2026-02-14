@@ -36,6 +36,8 @@ This table is designed with the following goals:
 | gemini_api_key_updated_at          | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Gemini API key update           |
 | gemini_api_key_vertexai_encrypted  | TEXT        | NO       | NO     |                        | Encrypted Gemini(VertexAI) API key (optional)         |
 | gemini_api_key_vertexai_updated_at | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Gemini(VertexAI) API key update |
+| uwgen_api_key                      | TEXT        | NO       | NO     |                        | Encrypted Uwgen API key (optional)                    |
+| uwgen_api_key_updated_at           | TIMESTAMPZ  | NO       | NO     |                        | Timestamp of the last Uwgen API key update            |
 
 ## Indexes
 

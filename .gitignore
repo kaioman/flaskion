@@ -4,3 +4,4 @@ __pycache__
 docker-container/.env
 flaskion/media/*
 flaskion/log/*
+credentials

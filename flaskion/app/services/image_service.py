@@ -1,3 +1,4 @@
+import os
 import uuid
 import libcore_hng.utils.app_logger as app_logger
 from typing import Type, TypeVar
@@ -105,7 +106,11 @@ class ImageGenService:
         
         # 画像生成を実行
         try:
-            generator = CoreImageGenerator(api_key=params_result.decrypted_api_key)
+            generator = CoreImageGenerator(
+                api_key=params_result.decrypted_api_key,
+                project_id=os.getenv("VERTEXAI_PROJECT_ID"),
+                location=os.getenv("VERTEXAI_LOCATION")
+            )
             response = generator.generate(params_result.params)
         except NoCandidatesError:
             return AIServiceResult(
@@ -167,7 +172,11 @@ class ImageGenService:
         
         # 画像編集を実行
         try:
-            editor = CoreImageEditor(api_key=params_result.decrypted_api_key)
+            editor = CoreImageEditor(
+                api_key=params_result.decrypted_api_key,
+                project_id=os.getenv("VERTEXAI_PROJECT_ID"),
+                location=os.getenv("VERTEXAI_LOCATION")
+            )
             response = editor.edit(params_result.params, source_image.stream)
         except NoCandidatesError:
             return AIServiceResult(
@@ -229,7 +238,11 @@ class ImageGenService:
         # 画像解析を実行
         try:
             raw_bytes = source_image if isinstance(source_image, bytes) else source_image.stream.read()
-            analyzer = CoreImageAnalyzer(api_key=params_result.decrypted_api_key)
+            analyzer = CoreImageAnalyzer(
+                api_key=params_result.decrypted_api_key,
+                project_id=os.getenv("VERTEXAI_PROJECT_ID"),
+                location=os.getenv("VERTEXAI_LOCATION")
+            )
             response = analyzer.analyze(params_result.params, raw_bytes)
         except Exception:
             return AIServiceResult(

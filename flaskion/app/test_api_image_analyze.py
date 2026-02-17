@@ -15,7 +15,7 @@ payload = {
 }
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-image_path = os.path.join(base_dir, "hero_02.png")
+image_path = os.path.join(base_dir, "analyze_test_pic.png")
 
 files = {
     "sourceImage": open(image_path, "rb")

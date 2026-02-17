@@ -48,7 +48,7 @@ class CoreImageAnalyzer:
                 prompt=params.prompt,
                 model=params.model
             )
-            app_logger.info(f"[CoreImageAnalyzer] Image analyze completed. result_count={len(response['result'])}")
+            app_logger.info(f"[CoreImageAnalyzer] Image analyze completed. result_count={len(response['text'])}")
             return response
         
         except Exception as e:

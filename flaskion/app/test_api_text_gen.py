@@ -10,7 +10,7 @@ headers = {
 
 payload = {
     "prompt":"三権分立について教えてください",
-    "model": GeminiClient.GeminiModel.GEMINI_3_0_FLASH_PREVIEW.value,
+    "model": GeminiClient.GeminiModel.GEMINI_2_5_FLASH_LITE.value,
 }
 
 res = requests.post(ENDPOINT, json=payload, headers=headers)

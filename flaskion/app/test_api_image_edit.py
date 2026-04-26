@@ -11,8 +11,8 @@ headers = {
 }
 
 payload = {
-    "prompt":"ポーズや構図はそのままで、服装を女子高生風にして",
-    "model": GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW.value,
+    "prompt":"ポーズや構図はそのままで、笑顔にして",
+    "model": GeminiClient.GeminiModel.GEMINI_2_5_FLASH_IMAGE.value,
     "resolution": GeminiClient.ImageSize.TWO_K.value,
     "aspect": GeminiClient.AspectRatio.SQUARE.value,
     "safety_filter": GeminiClient.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT.value,
@@ -20,7 +20,7 @@ payload = {
 }
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-image_path = os.path.join(base_dir, "hero_02.png")
+image_path = os.path.join(base_dir, "analyze_test_pic.png")
 
 files = {
     "sourceImage": open(image_path, "rb")
@@ -29,15 +29,20 @@ files = {
 res = requests.post(ENDPOINT, data=payload, files=files, headers=headers)
 json_data = res.json()
 
-images = json_data["data"]["generated"]["images"]
+if json_data["data"]:
 
-output_dir = os.path.dirname(os.path.abspath(__file__))
+    images = json_data["data"]["generated"]["images"]
 
-for idx, img_b64 in enumerate(images):
-    img_bytes = base64.b64decode(img_b64)
-    file_path = os.path.join(output_dir, f"generated_{idx}.png")
-    
-    with open(file_path, "wb") as f:
-        f.write(img_bytes)
-    
-    print(f"Saved: {file_path}")
+    output_dir = os.path.dirname(os.path.abspath(__file__))
+
+    for idx, img_b64 in enumerate(images):
+        img_bytes = base64.b64decode(img_b64)
+        file_path = os.path.join(output_dir, f"generated_{idx}.png")
+        
+        with open(file_path, "wb") as f:
+            f.write(img_bytes)
+        
+        print(f"Saved: {file_path}")
+else:
+    if json_data["errors"]:
+        print(f"{json_data["errors"]}")

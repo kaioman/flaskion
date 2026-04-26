@@ -66,7 +66,7 @@ class ComfyUIImageGenerationStrategy(ImageGenerationStrategy):
                 f"rating_level={params.rating_level}, batch_size={params.batch_size}"
             )
 
-            # CoreImageGenerator を初期化
+            # ComfyUIImageGenerator を初期化
             generator = ComfyUIImageGenerator(
                 base_url=self.api_url,
                 timeout_seconds=self.timeout_seconds,

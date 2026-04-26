@@ -19,8 +19,8 @@ from app.models.base_params import BaseParams
 from app.models.base_image_params import BaseImageParams
 from app.models.user import User
 from app.services.encrypt_service import EncryptService
-from app.services.image_generation.core_edit import CoreImageEditor
-from app.services.image_generation.core_analyze import CoreImageAnalyzer
+from app.services.image_generation.gemini_edit import GeminiImageEditor
+from app.services.image_generation.gemini_analyze import GeminiImageAnalyzer
 from app.services.image_generation.base import StorageStrategy
 from app.services.image_generation.image_generation_strategy import ImageGenerationStrategy
 
@@ -204,7 +204,7 @@ class ImageGenService:
         
         # 画像編集を実行
         try:
-            editor = CoreImageEditor(
+            editor = GeminiImageEditor(
                 api_key=params_result.decrypted_api_key,
                 project_id=os.getenv("VERTEXAI_PROJECT_ID"),
                 location=os.getenv("VERTEXAI_LOCATION")
@@ -270,7 +270,7 @@ class ImageGenService:
         # 画像解析を実行
         try:
             raw_bytes = source_image if isinstance(source_image, bytes) else source_image.stream.read()
-            analyzer = CoreImageAnalyzer(
+            analyzer = GeminiImageAnalyzer(
                 api_key=params_result.decrypted_api_key,
                 project_id=os.getenv("VERTEXAI_PROJECT_ID"),
                 location=os.getenv("VERTEXAI_LOCATION")

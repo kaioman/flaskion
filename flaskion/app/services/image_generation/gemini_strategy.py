@@ -2,13 +2,13 @@ import libcore_hng.utils.app_logger as app_logger
 from typing import Dict, Any
 from app.models.image_gen_params import ImageGenParams
 from app.services.image_generation.image_generation_strategy import ImageGenerationStrategy
-from app.services.image_generation.core_generate import CoreImageGenerator
+from app.services.image_generation.gemini_generate import GeminiImageGenerator
 
 class GeminiImageGenerationStrategy(ImageGenerationStrategy):
     """
     Gemini API を使用した画像生成ストラテジ
     
-    既存の CoreImageGenerator をラップし、ImageGenerationStrategy インターフェースを実装
+    既存の GeminiImageGenerator をラップし、ImageGenerationStrategy インターフェースを実装
     """
 
     def __init__(self, project_id: str, location: str):
@@ -44,8 +44,8 @@ class GeminiImageGenerationStrategy(ImageGenerationStrategy):
         """
         app_logger.info("[GeminiImageGenerationStrategy] Starting generation...")
         
-        # CoreImageGenerator を初期化
-        generator = CoreImageGenerator(
+        # GeminiImageGenerator を初期化
+        generator = GeminiImageGenerator(
             api_key=api_key,
             project_id=self.project_id,
             location=self.location

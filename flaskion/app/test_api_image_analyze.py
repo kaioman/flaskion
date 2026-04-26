@@ -11,7 +11,7 @@ headers = {
 
 payload = {
     "prompt":"西暦2200年のイラストレーターになりきって、この画像の説明をしてください。口調は丁寧語。内容は毒舌。文字数はX(Twitter)の1ポスト(140文字以内)に収まるよう作成してください",
-    "model": GeminiClient.GeminiModel.GEMINI_3_0_FLASH_PREVIEW.value,
+    "model": GeminiClient.GeminiModel.GEMINI_2_5_FLASH_IMAGE.value,
 }
 
 base_dir = os.path.dirname(os.path.abspath(__file__))

@@ -5,7 +5,7 @@ from app.models.image_gen_params import ImageGenParams
 
 class CoreImageGenerator:
     """
-    画像生成のコア処理を担当する
+    Gemini画像生成のコア処理を担当する
     """
 
     def __init__(self, api_key, project_id, location):

@@ -10,7 +10,7 @@ from app.models.service_result import ParamsResult, AIServiceResult
 from app.models.base_params import BaseParams
 from app.models.user import User
 from app.services.encrypt_service import EncryptService
-from app.services.text_generation.core_generate import CoreTextGenerator
+from app.services.text_generation.gemini_generate import GeminiTextGenerator
 
 T = TypeVar('T', bound=BaseParams)
 
@@ -90,7 +90,7 @@ class TextGenService:
         
         # テキスト生成を実行
         try:
-            generator = CoreTextGenerator(api_key=params_result.decrypted_api_key)
+            generator = GeminiTextGenerator(api_key=params_result.decrypted_api_key)
             response = generator.generate(params_result.params)
         except Exception as e:
             # エラーログ出力

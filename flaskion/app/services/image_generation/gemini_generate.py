@@ -1,12 +1,11 @@
 import libcore_hng.utils.app_logger as app_logger
-from PIL import Image as PIL_image
 from pycorex.gemini_client import GeminiClient
 from pycorex.exceptions.no_candidates_error import NoCandidatesError
-from app.models.image_edit_params import ImageEditParams
+from app.models.image_gen_params import ImageGenParams
 
-class CoreImageEditor:
+class GeminiImageGenerator:
     """
-    画像編集のコア処理を担当する
+    Gemini画像生成のコア処理を担当する
     """
 
     def __init__(self, api_key, project_id, location):
@@ -24,18 +23,17 @@ class CoreImageEditor:
         """
         # GeminiClientを初期化
         self.client = GeminiClient(api_key=api_key, project_id=project_id, location=location)
-        app_logger.info(f"[CoreImageEditor] GeminiClient initialized.")
+        app_logger.info(f"[GeminiImageGenerator] GeminiClient initialized.")
         
-    def edit(self, params: ImageEditParams, stream):
+    def generate(self, params: ImageGenParams):
         """
-        画像編集処理を実行する
+        画像生成処理を実行する
         
         Parameters
         ----------
-        params : ImageEditParams
-            画像編集パラメーターモデル
-        stream : IO[bytes]
-            ファイルストリーム
+        params : ImageGenParams
+            画像生成パラメーターモデル
+            
         Returns
         -------
         List[bytes]
@@ -43,21 +41,16 @@ class CoreImageEditor:
         """
     
         try:
-            # 元画像のバイナリデータを取得する
-            base_image = PIL_image.open(stream)
-
-            # 画像編集を実行する
-            app_logger.info(f"[CoreImageEditor] Editing image... ")
-            response = self.client.edit_image(
+            app_logger.info(f"[GeminiImageGenerator] Generating image... ")
+            response = self.client.generate_image(
                 prompt=params.prompt,
                 model=params.model,
-                base_image=base_image,
                 aspect_ratio=params.aspect,
                 image_size=params.resolution,
                 harm_category = params.safety_filter,
                 safety_filter_level = params.safety_level
             )
-            app_logger.info(f"[CoreImageEditor] Image edit completed. result_count={len(response['result'])}")
+            app_logger.info(f"[GeminiImageGenerator] Image generation completed. result_count={len(response['result'])}")
             return response
         
         except NoCandidatesError as e:

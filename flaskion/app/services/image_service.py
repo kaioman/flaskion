@@ -11,7 +11,7 @@ from pycorex.exceptions.no_candidates_error import NoCandidatesError
 from app.core.config import settings
 from app.core.enums import EncryptionKeyType, ImagePathType
 from app.core.errors import ImageGenError, ImageEditError, ImageAnalyzeError
-from app.models.image_gen_params import ImageGenParams
+from app.models.comfyui_image_gen_params import ComfyUIImageGenParams
 from app.models.image_edit_params import ImageEditParams
 from app.models.image_analyze_params import ImageAnalyzeParams
 from app.models.service_result import ParamsResult, AIServiceResult
@@ -19,10 +19,10 @@ from app.models.base_params import BaseParams
 from app.models.base_image_params import BaseImageParams
 from app.models.user import User
 from app.services.encrypt_service import EncryptService
-from app.services.image_generation.core_generate import CoreImageGenerator
-from app.services.image_generation.core_edit import CoreImageEditor
-from app.services.image_generation.core_analyze import CoreImageAnalyzer
+from app.services.image_generation.gemini_edit import GeminiImageEditor
+from app.services.image_generation.gemini_analyze import GeminiImageAnalyzer
 from app.services.image_generation.base import StorageStrategy
+from app.services.image_generation.image_generation_strategy import ImageGenerationStrategy
 
 T = TypeVar('T', bound=BaseParams)
 
@@ -35,16 +35,30 @@ class ImageGenService:
         """
         
         try:
+            # ComfyUIの場合は、JSON文字列をdictに変換
+            if isinstance(param_data, dict) and param_class == ComfyUIImageGenParams:
+                param_data = ComfyUIImageGenParams.parse_json_fields(param_data)
+            
             # フォームの入力値をパラメーターモデルクラスに設定する
             params = param_class(**param_data)
-            app_logger.info(f"[ImageGenService] Parameters validated. prompt_length={len(params.prompt)}")
-        except ValidationError:
-            app_logger.error(f"[ImageGenService] Parameters validation failed. user_id={current_user.id}")
+            app_logger.info(f"[ImageGenService] Parameters validated.")
+        except ValidationError as e:
+            app_logger.error(f"[ImageGenService] Parameters validation failed. user_id={current_user.id}, error={str(e)}")
             return ParamsResult(
                 params=None,
                 decrypted_api_key=None,
                 error_code=ImageGenError.INVALID_PARAMETER, 
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+
+        # ComfyUIはAPIキー不要
+        if isinstance(params, ComfyUIImageGenParams):
+            app_logger.info(f"[ImageGenService] ComfyUI mode - no API key required. user_id={current_user.id}")
+            return ParamsResult(
+                params=params,
+                decrypted_api_key="",  # ComfyUIはAPIキー不要
+                error_code=None, 
+                http_status=None
             )
 
         # プロンプト入力チェック
@@ -57,19 +71,23 @@ class ImageGenService:
                 http_status=HTTPStatus.BAD_REQUEST
             )
         
-        # 暗号化されたAPIキーを取得
+        # 暗号化されたAPIキーを取得（Gemini用）
         ciphertext = ""
         if isinstance(params, BaseImageParams):
+            # Gemini VertexAI用のAPIキー
             ciphertext = current_user.gemini_api_key_vertexai_encrypted
+            error_code = ImageGenError.MISSING_GEMINI_API_KEY
         else:
+            # Gemini API用のAPIキー
             ciphertext = current_user.gemini_api_key_encrypted
+            error_code = ImageGenError.MISSING_GEMINI_API_KEY
         
         if not ciphertext:
-            app_logger.error(f"[ImageGenService] Missing API key. user_id={current_user.id}")
+            app_logger.error(f"[ImageGenService] Missing API key. user_id={current_user.id}, param_class={param_class.__name__}")
             return ParamsResult(
                 params=None,
                 decrypted_api_key=None,
-                error_code=ImageGenError.MISSING_GEMINI_API_KEY, 
+                error_code=error_code, 
                 http_status=HTTPStatus.BAD_REQUEST
             )
         
@@ -87,16 +105,35 @@ class ImageGenService:
         )
         
     @staticmethod
-    def generate_image(current_user: User, param_data: dict, storage_strategy: StorageStrategy):
+    def generate_image(
+        current_user: User,
+        param_data: dict,
+        storage_strategy: StorageStrategy,
+        generation_strategy: ImageGenerationStrategy,
+        param_class: Type[BaseParams]
+    ):
         """
         画像生成メソッド
+        
+        Parameters
+        ----------
+        current_user : User
+            現在のユーザー
+        param_data : dict
+            リクエストパラメーター
+        storage_strategy : StorageStrategy
+            画像保存戦略
+        generation_strategy : ImageGenerationStrategy
+            画像生成戦略（Gemini、ComfyUI等）
+        param_class : Type[BaseParams]
+            パラメーターモデルクラス
         """
         
         # 開始ログ
         app_logger.info(f"[ImageGenService] Start image generation. user_id={current_user.id}")
 
         # パラメーターを取得する
-        params_result = ImageGenService.get_params(current_user, param_data, ImageGenParams)
+        params_result = ImageGenService.get_params(current_user, param_data, param_class)
         if not params_result.params:
             return AIServiceResult(
                 result=None,
@@ -106,12 +143,7 @@ class ImageGenService:
         
         # 画像生成を実行
         try:
-            generator = CoreImageGenerator(
-                api_key=params_result.decrypted_api_key,
-                project_id=os.getenv("VERTEXAI_PROJECT_ID"),
-                location=os.getenv("VERTEXAI_LOCATION")
-            )
-            response = generator.generate(params_result.params)
+            response = generation_strategy.generate(params_result.params, params_result.decrypted_api_key)
         except NoCandidatesError:
             return AIServiceResult(
                 result=None,
@@ -172,7 +204,7 @@ class ImageGenService:
         
         # 画像編集を実行
         try:
-            editor = CoreImageEditor(
+            editor = GeminiImageEditor(
                 api_key=params_result.decrypted_api_key,
                 project_id=os.getenv("VERTEXAI_PROJECT_ID"),
                 location=os.getenv("VERTEXAI_LOCATION")
@@ -238,7 +270,7 @@ class ImageGenService:
         # 画像解析を実行
         try:
             raw_bytes = source_image if isinstance(source_image, bytes) else source_image.stream.read()
-            analyzer = CoreImageAnalyzer(
+            analyzer = GeminiImageAnalyzer(
                 api_key=params_result.decrypted_api_key,
                 project_id=os.getenv("VERTEXAI_PROJECT_ID"),
                 location=os.getenv("VERTEXAI_LOCATION")

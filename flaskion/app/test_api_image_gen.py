@@ -25,7 +25,7 @@ headers = {
 # }
 payload = {
     "prompt":"キャミソール姿の20代OL。少し酒に酔っている",
-    "model": GeminiClient.GeminiModel.GEMINI_3_0_PRO_IMAGE_PREVIEW.value,
+    "model": GeminiClient.GeminiModel.GEMINI_2_5_FLASH_IMAGE.value,
     "resolution": GeminiClient.ImageSize.TWO_K.value,
     "aspect": GeminiClient.AspectRatio.SQUARE.value
 }

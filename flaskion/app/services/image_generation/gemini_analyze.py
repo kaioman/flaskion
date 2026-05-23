@@ -2,7 +2,7 @@ import libcore_hng.utils.app_logger as app_logger
 from pycorex.gemini_client import GeminiClient
 from app.models.image_analyze_params import ImageAnalyzeParams
 
-class CoreImageAnalyzer:
+class GeminiImageAnalyzer:
     """
     画像解析のコア処理を担当する
     """
@@ -22,7 +22,7 @@ class CoreImageAnalyzer:
         """
         # GeminiClientを初期化
         self.client = GeminiClient(api_key=api_key, project_id=project_id, location=location)
-        app_logger.info(f"[CoreImageAnalyzer] GeminiClient initialized.")
+        app_logger.info(f"[GeminiImageAnalyzer] GeminiClient initialized.")
         
     def analyze(self, params: ImageAnalyzeParams, image_bytes):
         """
@@ -42,13 +42,13 @@ class CoreImageAnalyzer:
     
         try:
             # 画像解析を実行する
-            app_logger.info(f"[CoreImageAnalyzer] Analyzing image... ")
+            app_logger.info(f"[GeminiImageAnalyzer] Analyzing image... ")
             response = self.client.analyze_image(
                 base_image=image_bytes,
                 prompt=params.prompt,
                 model=params.model
             )
-            app_logger.info(f"[CoreImageAnalyzer] Image analyze completed. result_count={len(response['text'])}")
+            app_logger.info(f"[GeminiImageAnalyzer] Image analyze completed. result_count={len(response['text'])}")
             return response
         
         except Exception as e:

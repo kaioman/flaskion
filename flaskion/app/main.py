@@ -15,7 +15,7 @@ from app.models.current_user_result import AuthType
 
 # FlaskアプリケーションとSocketIOの初期化
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode="gevent")
+socketio = SocketIO(app, cors_allowed_origins=["http://pyhub.in-unchainworks.com:5100/"], async_mode="gevent")
 
 # Flask Secret-Keyを設定
 app.config["SECRET_KEY"] = settings.SECRET_KEY

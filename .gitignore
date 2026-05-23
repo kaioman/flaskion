@@ -5,3 +5,4 @@ docker-container/.env
 flaskion/media/*
 flaskion/log/*
 credentials
+sftp.json
